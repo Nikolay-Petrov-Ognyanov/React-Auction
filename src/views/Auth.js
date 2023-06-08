@@ -3,7 +3,7 @@ import * as service from "../service"
 import { Context } from "../Context"
 import { useNavigate } from "react-router-dom"
 
-export default function Auth() {
+export function Auth() {
     const { setUser } = useContext(Context)
 
     const [isRegistering, setIsRegistering] = useState(true)

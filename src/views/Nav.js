@@ -3,7 +3,7 @@ import { useNavigate, NavLink } from "react-router-dom"
 import { Context } from "../Context"
 import * as service from "../service"
 
-export default function Nav() {
+export function Nav() {
     const { user, setUser } = useContext(Context)
 
     const navigate = useNavigate()
@@ -18,10 +18,10 @@ export default function Nav() {
         navigate("/auth")
     }
 
-    return (<> {user && <nav>
+    return (<> {user ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Home</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
         <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>
         <button onClick={handleLogout}>Logout</button>
-    </nav> || <nav></nav>} </>)
+    </nav> : <h1>Auction</h1>} </>)
 }

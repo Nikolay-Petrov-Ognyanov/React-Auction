@@ -15,3 +15,7 @@ export function login(data) {
 export function logout(data) {
     return request.post(`${url}/users/logout`, data)
 }
+
+export function getUsers() {
+    return request.get(`${url}/users`)
+}
