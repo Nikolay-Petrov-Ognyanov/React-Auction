@@ -1,11 +1,12 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import * as service from "../service"
 import { useNavigate } from "react-router-dom"
 import { setUser } from "../features/user"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { addUser } from "../features/users"
 
 export function Auth() {
+    const users = useSelector(state => state.users)
 
     const [isRegistering, setIsRegistering] = useState(true)
 
@@ -29,7 +30,7 @@ export function Auth() {
 
         setInputs(state => ({ ...state, [name]: value }))
         setErrors(state => ({ ...state, server: "" }))
-        
+
         validateInput(event)
     }
 
@@ -71,18 +72,19 @@ export function Auth() {
                 response = await service.login(formData)
             }
 
-            if (!response.message) {
-                const userData = response
-
-                for (let key in userData) {
-                    localStorage.setItem(key, userData[key])
+            if (response && !response.message) {
+                for (let key in response) {
+                    localStorage.setItem(key, response[key])
                 }
 
-                dispatch(setUser(userData))
-                dispatch(addUser(userData))
+                dispatch(setUser(response))
+
+                if (!users.find(u => u.username === response.username)) {
+                    dispatch(addUser(response))
+                }
 
                 navigate("/")
-            } else {
+            } else if (response && response.message) {
                 setErrors(state => ({ ...state, server: response.message }))
             }
         }
