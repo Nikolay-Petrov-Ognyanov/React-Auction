@@ -9,19 +9,15 @@ export const usersSlice = createSlice({
             state.push(action.payload)
         },
         updateUser: (state, action) => {
-            const entries = Object.entries(action.payload).filter(a => a[0] !== "index")
+            const { index, ...updatedUser } = action.payload
 
-            const newUser = {}
+            // console.log(index)
 
-            for (let entry of entries) {
-                newUser[entry[0]] = entry[1]
-            }
-
-            state.splice(action.payload.index, 1, newUser)
+            state.splice(index, 1, updatedUser)
         }
     }
 })
 
-export const { addUser, updateUser } = usersSlice.actions
+export const { addUser, updateUser: updatedUser } = usersSlice.actions
 
 export const usersReducer = usersSlice.reducer
