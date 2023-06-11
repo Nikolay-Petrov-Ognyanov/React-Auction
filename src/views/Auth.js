@@ -1,12 +1,15 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
 import * as service from "../service"
-import { Context } from "../Context"
 import { useNavigate } from "react-router-dom"
+import { setUser } from "../features/user"
+import { useDispatch } from "react-redux"
+import { addUser } from "../features/users"
 
 export function Auth() {
-    const { setUser } = useContext(Context)
 
     const [isRegistering, setIsRegistering] = useState(true)
+
+    const dispatch = useDispatch()
 
     const [inputs, setInputs] = useState({
         username: "",
@@ -15,7 +18,8 @@ export function Auth() {
 
     const [errors, setErrors] = useState({
         username: "",
-        password: ""
+        password: "",
+        server: ""
     })
 
     const navigate = useNavigate()
@@ -24,7 +28,8 @@ export function Auth() {
         const { name, value } = event.target
 
         setInputs(state => ({ ...state, [name]: value }))
-
+        setErrors(state => ({ ...state, server: "" }))
+        
         validateInput(event)
     }
 
@@ -58,22 +63,27 @@ export function Auth() {
         const formData = Object.fromEntries(new FormData(event.target))
 
         if (!Object.values(formData).some(v => !v.trim())) {
-            let userData = null
+            let response = null
 
             if (isRegistering) {
-                userData = await service.register(formData)
+                response = await service.register(formData)
             } else {
-                userData = await service.login(formData)
+                response = await service.login(formData)
             }
 
-            if (userData) {
+            if (!response.message) {
+                const userData = response
+
                 for (let key in userData) {
                     localStorage.setItem(key, userData[key])
                 }
 
-                setUser(userData)
+                dispatch(setUser(userData))
+                dispatch(addUser(userData))
 
                 navigate("/")
+            } else {
+                setErrors(state => ({ ...state, server: response.message }))
             }
         }
     }
@@ -112,6 +122,7 @@ export function Auth() {
         <div className="errorsWrapper">
             {errors.username && <p className="error">{errors.username}</p>}
             {errors.password && <p className="error">{errors.password}</p>}
+            {errors.server && <p className="error">{errors.server}</p>}
         </div>
     </div>)
 }

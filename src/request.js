@@ -23,11 +23,7 @@ async function requester(url, method, data) {
         const response = await makeRequest(url, method, data)
         const result = response.status !== 204 && await response.json()
 
-        if (!result) {
-            throw new Error("Error fetching data.")
-        } else {
-            return result
-        }
+        return result || response
     } catch (error) {
         console.error(error)
     }

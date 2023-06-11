@@ -1,24 +1,24 @@
-import { useContext } from "react"
 import { useNavigate, NavLink } from "react-router-dom"
-import { Context } from "../Context"
 import * as service from "../service"
+import { useSelector, useDispatch } from "react-redux"
+import { setUser } from "../features/user"
 
 export function Nav() {
-    const { user, setUser } = useContext(Context)
-
+    const user = useSelector(state => state.user.value)
+    const dispatch = useDispatch()
     const navigate = useNavigate()
 
     async function handleLogout() {
-        await service.logout(localStorage.getItem("accessToken"))
+        await service.logout({ accessToken: user.accessToken })
 
-        setUser(null)
+        dispatch(setUser({}))
 
         localStorage.clear()
 
         navigate("/auth")
     }
 
-    return (<> {user ? <nav>
+    return (<> {user?.accessToken ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Home</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
         <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>

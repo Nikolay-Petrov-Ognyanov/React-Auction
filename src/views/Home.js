@@ -1,24 +1,16 @@
-import { useContext, useEffect } from "react"
-import * as service from "../service"
-import { useNavigate } from "react-router-dom"
-import { Context } from "../Context"
+import { useEffect } from "react"
+import { useSelector } from "react-redux"
 
 export function Home() {
-    const { user, users } = useContext(Context)
-
-    const navigate = useNavigate()
+    const users = useSelector(state => state.users)
 
     useEffect(() => {
-        // if (!localStorage.getItem("username")) {
-        //     navigate("/auth")
-        // }
-
-        service.getData().then(result =>
-            console.log(result)
-        ).catch(error => console.error(error))
-    }, [])
+        console.log(users)
+    }, [users])
 
     return (<section>
         Home Page
+
+        {users.map(u => <p key={u._id}> {u.username} </p>)}
     </section>)
 }
