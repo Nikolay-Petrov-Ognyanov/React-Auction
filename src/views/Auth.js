@@ -79,7 +79,7 @@ export function Auth() {
 
                 dispatch(setUser(response))
 
-                if (!users.find(u => u.username === response.username)) {
+                if (!users.find(u => u._id === response._id)) {
                     dispatch(addUser(response))
                 }
 
