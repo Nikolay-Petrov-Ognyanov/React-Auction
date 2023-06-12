@@ -1,23 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit"
-import { useSelector } from "react-redux"
 
 export const usersSlice = createSlice({
     name: "users",
     initialState: [],
     reducers: {
-        addUser: (state, action) => {
-            state.push(action.payload)
+        setUsers: (state, { payload }) => {
+            return state = payload
         },
-        updateUser: (state, action) => {
-            const { index, ...updatedUser } = action.payload
-
-            // console.log(index)
-
-            state.splice(index, 1, updatedUser)
+        addUser: (state, { payload }) => {
+            state.push(payload)
+        },
+        updateUser: (state, { payload }) => {
+            return state = state.map(u => u._id === payload._id ? payload : u)
         }
     }
 })
 
-export const { addUser, updateUser: updatedUser } = usersSlice.actions
+export const { setUsers, addUser, updateUser } = usersSlice.actions
 
 export const usersReducer = usersSlice.reducer

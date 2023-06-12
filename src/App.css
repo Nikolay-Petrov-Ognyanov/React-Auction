@@ -1,7 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@800&display=swap');
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 .App {
-  width: 100vw;
-  height: 100vh;
+  font-family: Inconsolata;
   font-size: 4vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
 }
 
 .App * {
@@ -18,8 +34,8 @@ nav {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  padding: 1vw 0;
-  height: 9vw;
+  margin: 2vw 0;
+  height: 6vw;
 }
 
 h1 {
@@ -38,25 +54,20 @@ h1 {
 }
 
 .auth form {
-  width: 42vw;
   height: 50%;
   display: flex;
   flex-direction: column;
-  gap: 1vw;
+  gap: 2vw;
 }
 
 input {
   border: 0.5vw solid;
-}
-
-.buttonsWrapper {
-  display: flex;
-  justify-content: space-around;
+  width: 47vw;
 }
 
 button,
 .button {
-  min-width: 20vw;
+  min-width: 22.5vw;
   border: 0.5vw solid;
   display: block;
   text-decoration: none;
@@ -75,14 +86,28 @@ button:hover,
   color: black;
 }
 
+.buttonsWrapper {
+  display: flex;
+  justify-content: space-around;
+  gap: 2vw;
+}
+
 .errorsWrapper {
   margin-top: 1vw;
-  font-size: 3vw;
+  font-size: 4vw;
 }
 
 section {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  height: calc(100vh - 10vw);
+}
+
+form {
+  margin-top: 2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vw;
 }

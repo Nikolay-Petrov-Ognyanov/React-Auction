@@ -1,22 +1,30 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { addProperty } from "../features/user"
-import { updatedUser } from "../features/users"
+import * as service from "../service"
+import * as userActions from "../features/user"
+import * as usersActions from "../features/users"
 
 export function Home() {
     const users = useSelector(state => state.users)
     const user = useSelector(state => state.user.value)
-
-    const index = users.map(u => u._id).indexOf(user._id)
-    const newUser = { ...user, index, username: "Nikinikiniki" }
-
     const dispatch = useDispatch()
 
-    function handleChangeUsername() {
-        console.log(index)
+    useEffect(() => {
+        service.readUsers().then(
+            result => {
+                const { users } = result
 
-        dispatch(addProperty({ key: "newKey", value: "newProp" }))
-        dispatch(updatedUser(newUser))
+                dispatch(usersActions.setUsers(users))
+            }
+        ).catch(error => console.error(error))
+    }, [dispatch])
+
+
+    const newUser = { ...user, username: "Nikinikiniki" }
+
+    function handleChangeUsername() {
+        dispatch(userActions.addProperty({ key: "newKey", value: "newProp" }))
+        dispatch(usersActions.updateUser(newUser))
     }
 
     return (<section>

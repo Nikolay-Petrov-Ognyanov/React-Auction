@@ -1,13 +1,11 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import * as service from "../service"
 import { useNavigate } from "react-router-dom"
-import { setUser } from "../features/user"
-import { useDispatch, useSelector } from "react-redux"
-import { addUser } from "../features/users"
+import { useDispatch } from "react-redux"
+import * as userActions from "../features/user"
+import * as usersActions from "../features/users"
 
 export function Auth() {
-    const users = useSelector(state => state.users)
-
     const [isRegistering, setIsRegistering] = useState(true)
 
     const dispatch = useDispatch()
@@ -77,10 +75,14 @@ export function Auth() {
                     localStorage.setItem(key, response[key])
                 }
 
-                dispatch(setUser(response))
+                dispatch(userActions.setUser(response))
 
-                if (!users.find(u => u._id === response._id)) {
-                    dispatch(addUser(response))
+                const { users } = await service.readUsers()
+
+                dispatch(usersActions.setUsers(users))
+
+                if (users.length > 0 && !users.find(u => u._id === response._id)) {
+                    dispatch(usersActions.addUser(response))
                 }
 
                 navigate("/")
