@@ -24,8 +24,8 @@ input[type=number] {
 .App * {
   text-align: center;
   background-color: black;
-  color: rgb(132, 0, 255);
-  border-color: rgb(132, 0, 255);
+  color: rgb(157, 0, 255);
+  border-color: rgb(157, 0, 255);
   border-radius: 4vw;
   outline: none;
 }
@@ -82,8 +82,8 @@ button,
 button:hover,
 .button:hover {
   cursor: pointer;
-  background-color: rgb(132, 0, 255);
-  border-color: rgb(132, 0, 255);
+  background-color: rgb(157, 0, 255);
+  border-color: rgb(157, 0, 255);
   color: black;
 }
 
@@ -129,6 +129,23 @@ form {
   display: flex;
   justify-content: space-evenly;
   width: calc((96vw - 2 * 2vw - 10vw - 2vw));
+}
+
+.cardInfo > * {
+  text-align: left;
+  padding: 0 1vw;
+}
+
+.auctionName {
+  width: 20vw;
+}
+
+.auctionDuration {
+  width: 25vw;
+}
+
+.auctionPrice {
+  width: 30vw;
 }
 
 .bidButton {
