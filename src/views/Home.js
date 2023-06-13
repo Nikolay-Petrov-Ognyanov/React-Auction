@@ -43,6 +43,8 @@ export function Home() {
 
             const result = await service.createBid(auctionId, auction)
 
+            console.log(result)
+
             dispatch(auctionsActions.updateAuction(result))
         } catch (error) {
             console.error(error.message.message)
@@ -52,7 +54,7 @@ export function Home() {
     return (<section>
         Home Page
 
-        {auctions.length > 0 && auctions.map(a => <div className="auctionCard" key={a._id}>
+        {auctions.map(a => <div className="auctionCard" key={a._id}>
             <div className="cardInfo">
                 <p className="auctionName"> Name: {a.name} </p>
 
@@ -80,6 +82,7 @@ export function Home() {
                 className="bidButton"
                 onClick={() => handleBid(a._id, a.price)}
             > Bid </button>
-        </div>)}
+        </div>)
+        }
     </section >)
 }
