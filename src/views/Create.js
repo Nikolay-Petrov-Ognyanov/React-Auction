@@ -30,16 +30,16 @@ export function Create() {
             if (name === "name") {
                 if (!value) {
                     stateObject[name] = "Name is required."
-                } else if (value.length < 2 || value.length > 20) {
-                    stateObject[name] = "Name must be between 2 and 20 characters long."
+                } else if (value.length < 2 || value.length > 5) {
+                    stateObject[name] = "Name must be between 2 and 5 characters long."
                 }
             } else if (name === "price") {
                 if (!value) {
                     stateObject[name] = "Price is required."
                 } else if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Price must be a whole number."
-                } else if (value.length > 20) {
-                    stateObject[name] = "Price must be at most 20 characters long."
+                } else if (value.length > 5) {
+                    stateObject[name] = "Price must be at most 5 characters long."
                 }
             }
 
@@ -51,10 +51,11 @@ export function Create() {
         event.preventDefault()
 
         const formData = Object.fromEntries(new FormData(event.target))
+        const expirationTime = Date.now() + 24 * 60 * 60 * 1000
+        const auction = { ...formData, expirationTime }
+        const result = await service.createAuction(auction)
 
-        const auctions = await service.createAuction(formData)
-
-        console.log(auctions)
+        console.log(result)
     }
 
     return (<section>

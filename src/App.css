@@ -7,6 +7,7 @@ input::-webkit-inner-spin-button {
 }
 
 input[type=number] {
+  appearance: textfield;
   -moz-appearance: textfield;
 }
 
@@ -110,4 +111,29 @@ form {
   flex-direction: column;
   align-items: center;
   gap: 2vw;
+}
+
+.auctionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 0.5vw solid;
+  width: 96vw;
+  overflow: hidden;
+  padding: 0 2vw;
+  font-size: 3vw;
+  margin-bottom: 1vw;
+}
+
+.cardInfo {
+  display: flex;
+  justify-content: space-evenly;
+  width: calc((96vw - 2 * 2vw - 10vw - 2vw));
+}
+
+.bidButton {
+  min-width: 0;
+  height: 4vw;
+  width: 10vw;
+  border: 0.25vw solid;
 }

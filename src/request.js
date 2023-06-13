@@ -25,7 +25,7 @@ async function requester(url, method, data) {
 
         return result || response
     } catch (error) {
-        console.error(error)
+        console.error(error.message)
     }
 }
 

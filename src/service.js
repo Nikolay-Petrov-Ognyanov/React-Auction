@@ -23,3 +23,11 @@ export function readUsers() {
 export function createAuction(data) {
     return request.post(`${url}/auctions`, data)
 }
+
+export function readAuctions() {
+    return request.get(`${url}/auctions`)
+}
+
+export function createBid(auctionId, data) {
+    return request.put(`${url}/auctions/${auctionId}`, data)
+}

@@ -8,11 +8,15 @@ import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
 import { userReducer } from './features/user'
 import { usersReducer } from './features/users'
+import { auctionsReducer } from './features/auctions'
+import { auctionReducer } from './features/auction'
 
 const store = configureStore({
 	reducer: {
 		user: userReducer,
-		users: usersReducer
+		users: usersReducer,
+		auction: auctionReducer,
+		auctions: auctionsReducer
 	}
 })
 
