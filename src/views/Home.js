@@ -5,6 +5,7 @@ import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
 
 export function Home() {
+    const user = useSelector(state => state.user.value)
     const auctions = useSelector(state => state.auctions)
 
     const dispatch = useDispatch()
@@ -16,38 +17,62 @@ export function Home() {
 
                 dispatch(usersActions.setUsers(users))
             }
-        ).catch(error => console.error(error.message))
+        ).catch(error => console.log(error.message))
 
-        service.readAuctions().then(
-            result => {
+        const interval = setInterval(() => {
+            service.readAuctions().then(result => {
                 const { auctions } = result
 
+                auctions.forEach(auction => {
+                    if (auction.expirationTime > Date.now()) return
+
+                    service.deleteAuction(auctions._id).then(
+                        dispatch(auctionsActions.deleteAuction(auction._id))
+                    ).catch(error => console.log(error.message))
+                })
+
                 dispatch(auctionsActions.setAuctions(auctions))
-            }
-        )
+            })
+        }, 10000)
+
+        return () => clearInterval(interval)
     }, [dispatch])
 
-    function hours(time) {
-        return time / (60 * 60 * 1000)
+    function minutes(time) {
+        return time / (60 * 1000)
     }
 
     async function handleBid(auctionId, price) {
         try {
-            let bid = Math.round(price + price * 0.05)
+            let bid = price + 5
 
-            if (bid === price) {
-                bid = price + 1
+            if (price >= 100 && price < 200) {
+                bid = price + 10
             }
 
-            const auction = { ...auctions.find(a => a._id === auctionId), price: bid }
+            if (price >= 200 && price < 500) {
+                bid = price + 20
+            }
 
-            const result = await service.createBid(auctionId, auction)
+            if (price >= 500 && price < 1000) {
+                bid = price + 50
+            }
 
-            console.log(result)
+            if (price >= 1000) {
+                bid = price + 100
+            }
+
+            const auction = {
+                ...auctions.find(a => a._id === auctionId),
+                price: bid,
+                bidderId: user._id
+            }
+
+            const result = await service.updateAuction(auctionId, auction)
 
             dispatch(auctionsActions.updateAuction(result))
         } catch (error) {
-            console.error(error.message.message)
+            console.log(error.message.message)
         }
     }
 
@@ -56,25 +81,28 @@ export function Home() {
 
         {auctions.map(a => <div className="auctionCard" key={a._id}>
             <div className="cardInfo">
-                <p className="auctionName"> Name: {a.name} </p>
-
-                <p className="auctionDuration">
-                    Duration: {" "}
-
-                    <span className="short">
-                        {hours(Math.abs(a.expirationTime - Date.now())) < 8 && "Short"}
-                    </span>
-
-                    <span className="medium">
-                        {hours(Math.abs(a.expirationTime - Date.now())) < 16 && "Medium"}
-                    </span>
-
-                    <span className="long">
-                        {hours(Math.abs(a.expirationTime - Date.now())) > 16 && "Long"}
-                    </span>
+                <p className="auctionName">
+                    {a.name}
                 </p>
 
-                <p className="auctionPrice"> Current bid: {a.price} </p>
+                <p className="auctionDuration">
+                    <span className="short">{
+                        minutes(Math.floor(a.expirationTime - Date.now())) < 5 && "Short"
+                    }</span>
+
+                    <span className="medium">{
+                        minutes(Math.floor(a.expirationTime - Date.now())) >= 5 &&
+                        minutes(Math.floor(a.expirationTime - Date.now())) < 10 && "Medium"
+                    }</span>
+
+                    <span className="long">{
+                        minutes(Math.floor(a.expirationTime - Date.now())) >= 10 && "Long"
+                    }</span>
+                </p>
+
+                <p className="auctionPrice">
+                    {a.price}
+                </p>
             </div>
 
             <button

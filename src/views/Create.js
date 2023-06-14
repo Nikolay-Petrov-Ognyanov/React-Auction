@@ -51,7 +51,7 @@ export function Create() {
         event.preventDefault()
 
         const formData = Object.fromEntries(new FormData(event.target))
-        const expirationTime = Date.now() + 24 * 60 * 60 * 1000
+        const expirationTime = Date.now() + 15 * 60 * 1000
         const auction = { ...formData, expirationTime }
         const result = await service.createAuction(auction)
 

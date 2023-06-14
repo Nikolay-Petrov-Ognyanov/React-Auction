@@ -28,6 +28,10 @@ export function readAuctions() {
     return request.get(`${url}/auctions`)
 }
 
-export function createBid(auctionId, data) {
+export function updateAuction(auctionId, data) {
     return request.put(`${url}/auctions/${auctionId}`, data)
+}
+
+export function deleteAuction(auctionId) {
+    return request.del(`${url}/auctions/${auctionId}`)
 }

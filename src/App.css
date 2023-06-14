@@ -120,37 +120,33 @@ form {
   border: 0.5vw solid;
   width: 96vw;
   overflow: hidden;
-  padding: 0 2vw;
-  font-size: 3vw;
+  font-size: 4vw;
   margin-bottom: 1vw;
 }
 
 .cardInfo {
   display: flex;
-  justify-content: space-evenly;
-  width: calc((96vw - 2 * 2vw - 10vw - 2vw));
+  width: calc((96vw - 22.5vw));
 }
 
 .cardInfo > * {
-  text-align: left;
-  padding: 0 1vw;
+  width: 22.5vw;
+  margin-right: 2vw;
 }
 
-.auctionName {
-  width: 20vw;
+.short {
+  color: red;
 }
 
-.auctionDuration {
-  width: 25vw;
+.medium {
+  color: yellow;
 }
 
-.auctionPrice {
-  width: 30vw;
+.long {
+  color: green;
 }
 
-.bidButton {
-  min-width: 0;
-  height: 4vw;
-  width: 10vw;
-  border: 0.25vw solid;
+* .bidButton {
+  position: absolute;
+  right: 2vw;
 }
