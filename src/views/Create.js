@@ -1,10 +1,13 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
 import * as service from "../service"
 
 export function Create() {
     const navigate = useNavigate()
     const initialState = { name: "", price: "" }
+
+    const user = useSelector(state => state.user.value)
 
     const [inputs, setInputs] = useState(initialState)
     const [errors, setErrors] = useState({ ...initialState, server: "" })
@@ -49,7 +52,7 @@ export function Create() {
 
         const formData = Object.fromEntries(new FormData(event.target))
         const expirationTime = Date.now() + 15 * 60 * 1000
-        const auction = { ...formData, expirationTime }
+        const auction = { ...formData, expirationTime, ownerId: user._id }
 
         try {
             await service.createAuction(auction)

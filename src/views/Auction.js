@@ -100,7 +100,8 @@ export function Auction() {
             <p className="auctionPrice"> {a.price} </p>
         </div>
 
-        {a.bidderId !== user._id && <button type="submit" className="bidButton"
+        {user._id !== a.bidderId && user._id !== a.ownerId && <button
+            type="submit" className="bidButton"
             onClick={() => handleBid(a._id, a.price)}
         > Bid </button>}
     </div>)} </section >)
