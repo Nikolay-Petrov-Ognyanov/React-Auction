@@ -52,7 +52,12 @@ export function Create() {
 
         const formData = Object.fromEntries(new FormData(event.target))
         const expirationTime = Date.now() + 15 * 60 * 1000
-        const auction = { ...formData, expirationTime, ownerId: user._id }
+        const auction = {
+            ...formData,
+            expirationTime,
+            ownerId: user._id,
+            biddersIds: []
+        }
 
         try {
             await service.createAuction(auction)

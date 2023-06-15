@@ -52,6 +52,12 @@ export function Auction() {
         return time
     }
 
+    function updatebiddersIdsArray(biddersIds, userId) {
+        if (!biddersIds.includes(userId)) return [...biddersIds, userId]
+
+        return biddersIds
+    }
+
     async function handleBid(auctionId, price) {
         try {
             let bid = Math.round(price / 5) * 5 + 5
@@ -66,8 +72,9 @@ export function Auction() {
             const auctionToBeUpdated = {
                 ...auctionFromServer,
                 price: bid,
-                bidderId: user._id,
-                expirationTime: updateExpirationTime(auctionFromServer.expirationTime)
+                expirationTime: updateExpirationTime(auctionFromServer.expirationTime),
+                biddersIds: updatebiddersIdsArray(auctionFromServer.biddersIds, user._id),
+                highestBidderId: user._id,
             }
 
             await service.updateAuction(auctionId, auctionToBeUpdated)
@@ -75,6 +82,14 @@ export function Auction() {
             dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
         } catch (error) {
             console.log(error.message)
+        }
+    }
+
+    async function handleCancel(auctionId) {
+        if (auctions.find(a => a._id === auctionId)) {
+            await service.deleteAuction(auctionId)
+
+            dispatch(auctionsActions.deleteAuction(auctionId))
         }
     }
 
@@ -100,9 +115,12 @@ export function Auction() {
             <p className="auctionPrice"> {a.price} </p>
         </div>
 
-        {user._id !== a.bidderId && user._id !== a.ownerId && <button
-            type="submit" className="bidButton"
-            onClick={() => handleBid(a._id, a.price)}
+        {user._id !== a.highestBidderId && user._id !== a.ownerId && <button
+            className="cardButton" onClick={() => handleBid(a._id, a.price)}
         > Bid </button>}
+
+        {user._id === a.ownerId && <button
+            className="cardButton" onClick={() => handleCancel(a._id)}
+        > Cancel </button>}
     </div>)} </section >)
 }
