@@ -149,4 +149,7 @@ form {
 * .bidButton {
   position: absolute;
   right: 2vw;
+  /* border: none; */
+  /* border-left: 0.5vw solid; */
+  /* border-right: 0.5vw solid; */
 }

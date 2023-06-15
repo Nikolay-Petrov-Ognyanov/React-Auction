@@ -1,16 +1,13 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import * as service from "../service"
 
 export function Create() {
-    const [inputs, setInputs] = useState({
-        name: "",
-        price: ""
-    })
+    const navigate = useNavigate()
+    const initialState = { name: "", price: "" }
 
-    const [errors, setErrors] = useState({
-        name: "",
-        price: "",
-    })
+    const [inputs, setInputs] = useState(initialState)
+    const [errors, setErrors] = useState({ ...initialState, server: "" })
 
     function handleInputChange(event) {
         const { name, value } = event.target
@@ -30,16 +27,16 @@ export function Create() {
             if (name === "name") {
                 if (!value) {
                     stateObject[name] = "Name is required."
-                } else if (value.length < 2 || value.length > 5) {
-                    stateObject[name] = "Name must be between 2 and 5 characters long."
+                } else if (value.length > 10) {
+                    stateObject[name] = "Name could be at most 10 characters long."
                 }
             } else if (name === "price") {
                 if (!value) {
                     stateObject[name] = "Price is required."
                 } else if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Price must be a whole number."
-                } else if (value.length > 5) {
-                    stateObject[name] = "Price must be at most 5 characters long."
+                } else if (value.length > 10) {
+                    stateObject[name] = "Price must be at most 10 characters long."
                 }
             }
 
@@ -53,9 +50,14 @@ export function Create() {
         const formData = Object.fromEntries(new FormData(event.target))
         const expirationTime = Date.now() + 15 * 60 * 1000
         const auction = { ...formData, expirationTime }
-        const result = await service.createAuction(auction)
 
-        console.log(result)
+        try {
+            await service.createAuction(auction)
+
+            navigate("/")
+        } catch (error) {
+            setErrors(state => state.server = error.message)
+        }
     }
 
     return (<section>
@@ -84,7 +86,7 @@ export function Create() {
 
                 <div className="buttonsWrapper">
                     <button type="submit">Save</button>
-                    <button type="reset">Reset</button>
+                    <button type="reset" onClick={() => setInputs(initialState)}>Reset</button>
                 </div>
             }
         </form>
@@ -92,6 +94,7 @@ export function Create() {
         <div className="errorsWrapper">
             {errors.name && <p className="error">{errors.name}</p>}
             {errors.price && <p className="error">{errors.price}</p>}
+            {errors.server && <p className="error">{errors.server}</p>}
         </div>
     </section>)
 }

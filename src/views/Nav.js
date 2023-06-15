@@ -1,7 +1,7 @@
 import { useNavigate, NavLink } from "react-router-dom"
-import * as service from "../service"
 import { useSelector, useDispatch } from "react-redux"
 import { setUser } from "../features/user"
+import * as service from "../service"
 
 export function Nav() {
     const user = useSelector(state => state.user.value)
@@ -19,9 +19,9 @@ export function Nav() {
     }
 
     return (<> {user?.accessToken ? <nav>
-        <NavLink to={"/"} className="button" activeclassname="active">Home</NavLink>
+        <NavLink to={"/"} className="button" activeclassname="active">Auction</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
         <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>
         <button onClick={handleLogout}>Logout</button>
-    </nav> : <h1>Auction</h1>} </>)
+    </nav> : <h1>Sign in</h1>} </>)
 }

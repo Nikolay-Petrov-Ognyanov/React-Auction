@@ -6,22 +6,15 @@ import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 
 export function Auth() {
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
+
     const [isRegistering, setIsRegistering] = useState(true)
 
-    const dispatch = useDispatch()
+    const initialState = { username: "", password: "" }
 
-    const [inputs, setInputs] = useState({
-        username: "",
-        password: ""
-    })
-
-    const [errors, setErrors] = useState({
-        username: "",
-        password: "",
-        server: ""
-    })
-
-    const navigate = useNavigate()
+    const [inputs, setInputs] = useState(initialState)
+    const [errors, setErrors] = useState({ ...initialState, server: "" })
 
     function handleInputChange(event) {
         const { name, value } = event.target
