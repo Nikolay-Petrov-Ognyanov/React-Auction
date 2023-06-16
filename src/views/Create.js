@@ -1,16 +1,15 @@
-import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 import { useSelector } from "react-redux"
 import * as service from "../service"
 
 export function Create() {
-    const navigate = useNavigate()
     const initialState = { name: "", price: "" }
-
-    const user = useSelector(state => state.user.value)
 
     const [inputs, setInputs] = useState(initialState)
     const [errors, setErrors] = useState({ ...initialState, server: "" })
+
+    const user = useSelector(state => state.user.value)
 
     function handleInputChange(event) {
         const { name, value } = event.target
@@ -46,6 +45,8 @@ export function Create() {
             return stateObject
         })
     }
+
+    const navigate = useNavigate()
 
     async function handleSave(event) {
         event.preventDefault()

@@ -87,6 +87,12 @@ button:hover,
   color: black;
 }
 
+.button.active {
+  background-color: rgb(157, 0, 255);
+  border-color: rgb(157, 0, 255);
+  color: black;
+}
+
 .buttonsWrapper {
   display: flex;
   justify-content: space-around;

@@ -42,6 +42,7 @@ export function Auction() {
     }, [dispatch])
 
     const user = useSelector(state => state.user.value)
+    const users = useSelector(state => state.users)
     const auctions = useSelector(state => state.auctions)
 
     function formatTime(time) {
@@ -73,26 +74,37 @@ export function Auction() {
 
     async function handleBid(auctionId, price) {
         try {
-
-            let bid = calculateBid(price)
-
+            const bid = calculateBid(price)
             const auctionFromServer = auctions.find(a => a._id === auctionId)
+            const previousBidder = users.find(u => u._id === auctionFromServer.highestBidderId)
 
+            if (previousBidder) {
+                const previousBidderToBeRepaid = {
+                    ...previousBidder,
+                    wallet: previousBidder.wallet + auctionFromServer.price
+                }
+
+                await service.updateUser(previousBidderToBeRepaid)
+
+                dispatch(usersActions.updateUser(previousBidderToBeRepaid))
+            }
+            
             const auctionToBeUpdated = {
                 ...auctionFromServer,
                 price: bid,
                 expirationTime: updateExpirationTime(auctionFromServer.expirationTime),
                 biddersIds: updateBiddersIds(auctionFromServer.biddersIds, user._id),
                 highestBidderId: user._id,
+                previousBidderId: auctionFromServer.highestBidderId || ""
             }
 
-            const userToBeUpdated = { ...user, wallet: user.wallet - Math.ceil(bid) }
+            const hgihestBidderToBeUpdated = { ...user, wallet: user.wallet - Math.ceil(bid) }
 
-            await service.updateUser(userToBeUpdated)
             await service.updateAuction(auctionId, auctionToBeUpdated)
+            await service.updateUser(hgihestBidderToBeUpdated)
 
-            dispatch(userActions.setUser(userToBeUpdated))
-            dispatch(usersActions.updateUser(userToBeUpdated))
+            dispatch(userActions.setUser(hgihestBidderToBeUpdated))
+            dispatch(usersActions.updateUser(hgihestBidderToBeUpdated))
             dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
         } catch (error) {
             console.error(error)

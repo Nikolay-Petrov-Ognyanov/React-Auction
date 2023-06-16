@@ -1,16 +1,11 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom"
 import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 
 export function Auth() {
-    const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    const [isRegistering, setIsRegistering] = useState(true)
-
     const initialState = { username: "", password: "" }
 
     const [inputs, setInputs] = useState(initialState)
@@ -48,6 +43,11 @@ export function Auth() {
             return stateObject
         })
     }
+
+    const [isRegistering, setIsRegistering] = useState(true)
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     async function handleSubmit(event) {
         event.preventDefault()

@@ -1,12 +1,12 @@
 import { useNavigate, NavLink } from "react-router-dom"
-import { useSelector, useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { setUser } from "../features/user"
 import * as service from "../service"
 
 export function Nav() {
-    const user = useSelector(state => state.user.value)
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    const user = useSelector(state => state.user.value)
 
     async function handleLogout() {
         await service.logout({ accessToken: user.accessToken })
