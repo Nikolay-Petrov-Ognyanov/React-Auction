@@ -133,22 +133,6 @@ form {
   margin-right: 2vw;
 }
 
-.short {
-  color: red;
-}
-
-.medium {
-  color: yellow;
-}
-
-.long {
-  color: green;
-}
-
-* .cardButton {
-  /* position: absolute; */
-  /* right: 2vw; */
+.cardButton {
   border: none;
-  /* border-left: 0.5vw solid; */
-  /* border-right: 0.5vw solid; */
 }

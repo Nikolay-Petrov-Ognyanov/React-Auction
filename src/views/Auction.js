@@ -42,20 +42,20 @@ export function Auction() {
     const user = useSelector(state => state.user.value)
     const auctions = useSelector(state => state.auctions)
 
-    function minutes(time) {
-        return time / (60 * 1000)
+    function formatTime(time) {
+        const minutes = Math.floor(time / 60000)
+        const seconds = Math.floor((time % 60000) / 1000)
+        const clock = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+
+        return { minutes, seconds, clock }
     }
 
     function updateExpirationTime(time) {
-        if (minutes(time - Date.now()) < 10) return time + 5 * 60 * 1000
-
-        return time
+        return formatTime(time - Date.now()).minutes < 10 ? time + 5 * 60 * 1000 : time
     }
 
-    function updatebiddersIdsArray(biddersIds, userId) {
-        if (!biddersIds.includes(userId)) return [...biddersIds, userId]
-
-        return biddersIds
+    function updateBiddersIds(biddersIds, userId) {
+        return !biddersIds.includes(userId) ? [...biddersIds, userId] : biddersIds
     }
 
     async function handleBid(auctionId, price) {
@@ -73,7 +73,7 @@ export function Auction() {
                 ...auctionFromServer,
                 price: bid,
                 expirationTime: updateExpirationTime(auctionFromServer.expirationTime),
-                biddersIds: updatebiddersIdsArray(auctionFromServer.biddersIds, user._id),
+                biddersIds: updateBiddersIds(auctionFromServer.biddersIds, user._id),
                 highestBidderId: user._id,
             }
 
@@ -98,18 +98,7 @@ export function Auction() {
             <p className="auctionName"> {a.name} </p>
 
             <p className="auctionDuration">
-                <span className="short"> {
-                    minutes(Math.floor(a.expirationTime - Date.now())) < 5 && "Short"
-                } </span>
-
-                <span className="medium"> {
-                    minutes(Math.floor(a.expirationTime - Date.now())) >= 5 &&
-                    minutes(Math.floor(a.expirationTime - Date.now())) < 10 && "Medium"
-                } </span>
-
-                <span className="long"> {
-                    minutes(Math.floor(a.expirationTime - Date.now())) >= 10 && "Long"
-                } </span>
+                {formatTime(a.expirationTime - Date.now()).clock}
             </p>
 
             <p className="auctionPrice"> {a.price} </p>
