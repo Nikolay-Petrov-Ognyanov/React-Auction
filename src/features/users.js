@@ -17,5 +17,4 @@ export const usersSlice = createSlice({
 })
 
 export const { setUsers, addUser, updateUser } = usersSlice.actions
-
 export const usersReducer = usersSlice.reducer

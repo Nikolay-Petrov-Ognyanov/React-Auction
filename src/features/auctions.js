@@ -17,5 +17,4 @@ export const auctionsSlice = createSlice({
 })
 
 export const { setAuctions, updateAuction, deleteAuction } = auctionsSlice.actions
-
 export const auctionsReducer = auctionsSlice.reducer

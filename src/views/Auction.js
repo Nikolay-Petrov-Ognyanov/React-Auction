@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as service from "../service"
+import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
 
@@ -12,7 +13,8 @@ export function Auction() {
             const { users } = result
 
             dispatch(usersActions.setUsers(users))
-        }).catch(error => console.log(error.message))
+        }).catch(error => console.error(error)
+        )
     }, [dispatch])
 
     useEffect(() => {
@@ -58,14 +60,21 @@ export function Auction() {
         return !biddersIds.includes(userId) ? [...biddersIds, userId] : biddersIds
     }
 
+    function calculateBid(price) {
+        let bid = Math.round(price / 5) * 5 + 5
+
+        if (price >= 100 && price < 200) bid = Math.round(price / 10) * 10 + 10
+        if (price >= 200 && price < 500) bid = Math.round(price / 10) * 10 + 20
+        if (price >= 500 && price < 1000) bid = Math.round(price / 10) * 10 + 50
+        if (price >= 1000) bid = price + 100
+
+        return bid
+    }
+
     async function handleBid(auctionId, price) {
         try {
-            let bid = Math.round(price / 5) * 5 + 5
 
-            if (price >= 100 && price < 200) bid = Math.round(price / 10) * 10 + 10
-            if (price >= 200 && price < 500) bid = Math.round(price / 10) * 10 + 20
-            if (price >= 500 && price < 1000) bid = Math.round(price / 10) * 10 + 50
-            if (price >= 1000) bid = price + 100
+            let bid = calculateBid(price)
 
             const auctionFromServer = auctions.find(a => a._id === auctionId)
 
@@ -77,11 +86,16 @@ export function Auction() {
                 highestBidderId: user._id,
             }
 
+            const userToBeUpdated = { ...user, wallet: user.wallet - Math.ceil(bid) }
+
+            await service.updateUser(userToBeUpdated)
             await service.updateAuction(auctionId, auctionToBeUpdated)
 
+            dispatch(userActions.setUser(userToBeUpdated))
+            dispatch(usersActions.updateUser(userToBeUpdated))
             dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
         } catch (error) {
-            console.log(error.message)
+            console.error(error)
         }
     }
 
@@ -93,7 +107,7 @@ export function Auction() {
         }
     }
 
-    return (<section> {auctions.map(a => <div className="auctionCard" key={a._id}>
+    return <section> {auctions.map(a => <div className="auctionCard" key={a._id}>
         <div className="cardInfo">
             <p className="auctionName"> {a.name} </p>
 
@@ -101,7 +115,7 @@ export function Auction() {
                 {formatTime(a.expirationTime - Date.now()).clock}
             </p>
 
-            <p className="auctionPrice"> {a.price} </p>
+            <p className="auctionPrice"> {calculateBid(a.price)} </p>
         </div>
 
         {user._id !== a.highestBidderId && user._id !== a.ownerId && <button
@@ -111,5 +125,5 @@ export function Auction() {
         {user._id === a.ownerId && <button
             className="cardButton" onClick={() => handleCancel(a._id)}
         > Cancel </button>}
-    </div>)} </section >)
+    </div>)} </section >
 }

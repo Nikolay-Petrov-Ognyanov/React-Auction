@@ -68,7 +68,7 @@ export function Create() {
         }
     }
 
-    return (<section>
+    return <section>
         <form onSubmit={handleSave}>
             <input
                 type="text"
@@ -104,5 +104,5 @@ export function Create() {
             {errors.price && <p className="error">{errors.price}</p>}
             {errors.server && <p className="error">{errors.server}</p>}
         </div>
-    </section>)
+    </section>
 }

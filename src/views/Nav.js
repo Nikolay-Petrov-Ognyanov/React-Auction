@@ -18,10 +18,10 @@ export function Nav() {
         navigate("/auth")
     }
 
-    return (<> {user?.accessToken ? <nav>
+    return <> {localStorage.getItem("username") ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Auction</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
-        <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>
+        <NavLink to={"/wallet"} className="button" activeclassname="active">Wallet</NavLink>
         <button onClick={handleLogout}>Logout</button>
-    </nav> : <h1>Sign in</h1>} </>)
+    </nav> : <h1>Sign in</h1>} </>
 }

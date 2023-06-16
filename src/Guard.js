@@ -1,12 +1,9 @@
 import { Navigate, useLocation, Outlet } from "react-router-dom"
-import { useSelector } from "react-redux"
 
 export function Guard() {
-    const user = useSelector(state => state.user.value)
-
     const location = useLocation()
 
-    if (!user) {
+    if (!localStorage.getItem("username")) {
         return <Navigate to={"/auth"} replace state={{ from: location }} />
     }
 

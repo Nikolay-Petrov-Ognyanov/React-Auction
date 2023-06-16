@@ -20,6 +20,10 @@ export function readUsers() {
     return request.get(`${url}/users`)
 }
 
+export function updateUser(user) {
+    return request.put(`${url}/users/${user._id}`, user)
+}
+
 export function createAuction(data) {
     return request.post(`${url}/auctions`, data)
 }

@@ -1,7 +1,7 @@
 import { useState } from "react"
-import * as service from "../service"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
+import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 
@@ -58,7 +58,11 @@ export function Auth() {
             let response = null
 
             if (isRegistering) {
-                response = await service.register(formData)
+                response = await service.register({ ...formData, wallet: 10000 })
+
+                if (response?.message === "Username is taken.") {
+                    response = await service.login(formData)
+                }
             } else {
                 response = await service.login(formData)
             }
@@ -85,7 +89,7 @@ export function Auth() {
         }
     }
 
-    return (<div className="auth">
+    return <div className="auth">
         <form onSubmit={handleSubmit}>
             <input
                 type="text"
@@ -121,5 +125,5 @@ export function Auth() {
             {errors.password && <p className="error">{errors.password}</p>}
             {errors.server && <p className="error">{errors.server}</p>}
         </div>
-    </div>)
+    </div>
 }
