@@ -56,9 +56,10 @@ export function Create() {
         event.preventDefault()
 
         const { name, price } = Object.fromEntries(new FormData(event.target))
-        const expirationTime = Date.now() + 15 * 60 * 1000
+        const expirationTime = Date.now() + 5 * 60 * 1000
         const deposit = Math.ceil(price / 20)
-        const userToBeUpdated = { ...user, wallet: user.wallet - deposit }
+        const walletToBeUpdated = user.wallet - deposit
+        const userToBeUpdated = { ...user, wallet: walletToBeUpdated }
 
         const auction = {
             name,
@@ -72,6 +73,8 @@ export function Create() {
         try {
             await service.updateUser(userToBeUpdated)
             await service.createAuction(auction)
+
+            localStorage.setItem("wallet", walletToBeUpdated)
 
             dispatch(userActions.setUser(userToBeUpdated))
             dispatch(usersActions.updateUser(userToBeUpdated))
