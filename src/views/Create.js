@@ -19,15 +19,17 @@ export function Create() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    // Handles input change in the form
     function handleInputChange(event) {
         const { name, value } = event.target
 
-        setInputs(state => ({ ...state, [name]: value }))
-        setErrors(state => ({ ...state, server: "" }))
+        setInputs({ ...inputs, [name]: value })
+        setErrors({ ...errors, server: "" })
 
         validateInput(event)
     }
 
+    // Validates the input values
     function validateInput(event) {
         const { name, value } = event.target
 
@@ -54,6 +56,7 @@ export function Create() {
         })
     }
 
+    // Handles the form submission
     async function handleSave(event) {
         event.preventDefault()
 
@@ -119,15 +122,17 @@ export function Create() {
                 />
 
                 {/* Save and Reset buttons */}
-                {!Object.values(errors).some(entry => entry !== "") &&
-                    !Object.values(inputs).some(entry => entry === "") && (
-                        <div className="buttonsWrapper">
-                            <button type="submit">Save</button>
-                            <button type="reset" onClick={() => setInputs(initialState)}>
-                                Reset
-                            </button>
-                        </div>
-                    )}
+                {
+                    !Object.values(errors).some(entry => entry !== "") &&
+                    !Object.values(inputs).some(entry => entry === "") &&
+
+                    <div className="buttonsWrapper">
+                        <button type="submit">Save</button>
+                        <button type="reset" onClick={() => setInputs(initialState)}>
+                            Reset
+                        </button>
+                    </div>
+                }
             </form>
 
             {/* Error messages */}

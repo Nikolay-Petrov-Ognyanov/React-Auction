@@ -15,8 +15,8 @@ export function Auth() {
     function handleInputChange(event) {
         const { name, value } = event.target
 
-        setInputs(state => ({ ...state, [name]: value }))
-        setErrors(state => ({ ...state, server: "" }))
+        setInputs({ ...inputs, [name]: value })
+        setErrors({ ...errors, server: "" })
 
         validateInput(event)
     }
