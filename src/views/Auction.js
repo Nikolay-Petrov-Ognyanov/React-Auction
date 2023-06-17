@@ -16,8 +16,9 @@ export function Auction() {
         async function fetchUsers() {
             try {
                 const result = await service.readUsers()
+                const { users } = result
 
-                dispatch(usersActions.setUsers(result.users))
+                dispatch(usersActions.setUsers(users))
             } catch (error) {
                 console.error(error)
             }
@@ -32,27 +33,45 @@ export function Auction() {
                 const result = await service.readAuctions()
                 const { auctions } = result
 
+                console.log(auctions)
+
                 auctions.forEach(async auction => {
                     if (auction.expirationTime > Date.now()) return
 
-                    const tax = auction.price / 20 - auction.deposit
-                    const amountToBePaidToSeller = auction.price - tax
-                    const seller = users.find(u => u._id === auction.ownerId)
-                    // const buyer = users.find(u => u._id === auction.highestBidderId)
+                    const buyer = users.find(u => u._id === auction.highestBidderId)
 
-                    const sellerToBePaid = {
-                        ...seller,
-                        wallet: seller.wallet + amountToBePaidToSeller
+                    if (buyer) {
+                        const seller = users.find(u => u._id === auction.ownerId)
+                        const tax = Math.ceil(auction.price / 20) - auction.deposit
+                        const amountToBePaidToSeller = auction.price - tax
+
+                        const sellerToBePaid = {
+                            ...seller,
+                            wallet: seller.wallet + amountToBePaidToSeller
+                        }
+
+                        const buyerToBeAwarded = {
+                            ...buyer,
+                            wonAuctions: [...buyer.wonAuctions, auction]
+                        }
+
+                        await service.updateUser(sellerToBePaid)
+                        await service.updateUser(buyerToBeAwarded)
+                        
+                        if (user._id === seller._id) {
+                            dispatch(userActions.setUser(sellerToBePaid))
+                        }
+
+                        if (user._id === buyer._id) {
+                            dispatch(userActions.setUser(buyerToBeAwarded))
+                        }
+
+                        dispatch(usersActions.updateUser(sellerToBePaid))
+                        dispatch(usersActions.updateUser(buyerToBeAwarded))
                     }
 
-                    await service.updateUser(sellerToBePaid)
                     await service.deleteAuction(auction._id)
 
-                    if (user._id === seller._id) {
-                        dispatch(userActions.setUser(sellerToBePaid))
-                    }
-
-                    dispatch(usersActions.updateUser(sellerToBePaid))
                     dispatch(auctionsActions.deleteAuction(auction._id))
                 })
 
@@ -171,7 +190,16 @@ export function Auction() {
 
             <p className="auctionPrice">
                 {user._id === a.ownerId && a.price}
-                {user._id !== a.ownerId && calculateBid(a.price)}
+
+                {
+                    user._id !== a.ownerId &&
+                    user._id !== a.highestBidderId && calculateBid(a.price)
+                }
+
+                {
+                    user._id !== a.ownerId &&
+                    user._id === a.highestBidderId && a.price
+                }
             </p>
         </div>
 

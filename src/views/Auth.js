@@ -58,7 +58,11 @@ export function Auth() {
             let response = null
 
             if (isRegistering) {
-                response = await service.register({ ...formData, wallet: 10000 })
+                response = await service.register({
+                    ...formData,
+                    wallet: 10000,
+                    wonAuctions: []
+                })
 
                 if (response?.message === "Username is taken.") {
                     response = await service.login(formData)
