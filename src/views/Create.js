@@ -7,11 +7,13 @@ import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
 
 export function Create() {
+    // Initial state for form inputs and errors
     const initialState = { name: "", price: "" }
 
     const [inputs, setInputs] = useState(initialState)
     const [errors, setErrors] = useState({ ...initialState, server: "" })
 
+    // Get user data from Redux store
     const user = useSelector(state => state.user.value)
 
     const dispatch = useDispatch()
@@ -36,7 +38,7 @@ export function Create() {
                 if (!value) {
                     stateObject[name] = "Name is required."
                 } else if (value.length > 10) {
-                    stateObject[name] = "Name could be at most 10 characters long."
+                    stateObject[name] = "Name can be at most 10 characters long."
                 }
             } else if (name === "price") {
                 if (!value) {
@@ -44,7 +46,7 @@ export function Create() {
                 } else if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Price must be a whole number."
                 } else if (value.length > 10) {
-                    stateObject[name] = "Price must be at most 10 characters long."
+                    stateObject[name] = "Price can be at most 10 characters long."
                 }
             }
 
@@ -56,6 +58,8 @@ export function Create() {
         event.preventDefault()
 
         const { name, price } = Object.fromEntries(new FormData(event.target))
+
+        // Calculate auction details
         const expirationTime = Date.now() + 2 * 60 * 1000
         const deposit = Math.ceil(price / 20)
         const walletToBeUpdated = user.wallet - deposit
@@ -71,56 +75,67 @@ export function Create() {
         }
 
         try {
+            // Update user's wallet and create the auction
             await service.updateUser(userToBeUpdated)
             await service.createAuction(auction)
 
+            // Update wallet in local storage
             localStorage.setItem("wallet", walletToBeUpdated)
 
+            // Update user, user list, and auction in Redux store
             dispatch(userActions.setUser(userToBeUpdated))
             dispatch(usersActions.updateUser(userToBeUpdated))
             dispatch(auctionsActions.updateAuction(auction))
 
+            // Navigate to the main page
             navigate("/")
         } catch (error) {
-            setErrors(state => state.server = error.message)
+            // Set server error message
+            setErrors(state => (state.server = error.message))
         }
     }
 
-    return <section>
-        <form onSubmit={handleSave}>
-            <input
-                type="text"
-                name="name"
-                placeholder="name"
-                value={inputs.name}
-                onChange={handleInputChange}
-                onBlur={validateInput}
-            />
+    return (
+        <section>
+            <form onSubmit={handleSave}>
+                {/* Input for name */}
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Name"
+                    value={inputs.name}
+                    onChange={handleInputChange}
+                    onBlur={validateInput}
+                />
 
-            <input
-                type="number"
-                name="price"
-                placeholder="price"
-                value={inputs.price}
-                onChange={handleInputChange}
-                onBlur={validateInput}
-            />
+                {/* Input for price */}
+                <input
+                    type="number"
+                    name="price"
+                    placeholder="Price"
+                    value={inputs.price}
+                    onChange={handleInputChange}
+                    onBlur={validateInput}
+                />
 
-            {
-                !Object.values(errors).some(entry => entry !== "") &&
-                !Object.values(inputs).some(entry => entry === "") &&
+                {/* Save and Reset buttons */}
+                {!Object.values(errors).some(entry => entry !== "") &&
+                    !Object.values(inputs).some(entry => entry === "") && (
+                        <div className="buttonsWrapper">
+                            <button type="submit">Save</button>
+                            <button type="reset" onClick={() => setInputs(initialState)}>
+                                Reset
+                            </button>
+                        </div>
+                    )}
+            </form>
 
-                <div className="buttonsWrapper">
-                    <button type="submit">Save</button>
-                    <button type="reset" onClick={() => setInputs(initialState)}>Reset</button>
-                </div>
-            }
-        </form>
-
-        <div className="errorsWrapper">
-            {errors.name && <p className="error">{errors.name}</p>}
-            {errors.price && <p className="error">{errors.price}</p>}
-            {errors.server && <p className="error">{errors.server}</p>}
-        </div>
-    </section>
+            {/* Error messages */}
+            <div className="errorsWrapper">
+                {errors.name && <p className="error">{errors.name}</p>}
+                {errors.price && <p className="error">{errors.price}</p>}
+                {errors.server && <p className="error">{errors.server}</p>}
+            </div>
+        </section>
+    )
 }

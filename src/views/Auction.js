@@ -8,10 +8,12 @@ import * as auctionsActions from "../features/auctions"
 export function Auction() {
     const dispatch = useDispatch()
 
+    // Selecting data from the Redux store
     const user = useSelector(state => state.user.value)
     const users = useSelector(state => state.users)
     const auctions = useSelector(state => state.auctions)
 
+    // Fetching users from the server and updating the Redux store
     useEffect(() => {
         async function fetchUsers() {
             try {
@@ -27,6 +29,7 @@ export function Auction() {
         fetchUsers()
     }, [dispatch])
 
+    // Fetching auctions from the server, updating Redux store, processing auctions, and setting up a recurring interval to update auctions
     useEffect(() => {
         async function fetchAuctions() {
             try {
@@ -53,6 +56,7 @@ export function Auction() {
                             wonAuctions: [...buyer.wonAuctions, auction]
                         }
 
+                        // Updating user and dispatching actions
                         await service.updateUser(sellerToBePaid)
                         await service.updateUser(buyerToBeAwarded)
 
@@ -86,11 +90,14 @@ export function Auction() {
 
         fetchAuctions()
 
+        // Setting up interval to fetch auctions periodically
         const interval = setInterval(fetchAuctions, 1000)
 
+        // Clearing interval on component unmount
         return () => clearInterval(interval)
     }, [dispatch, user?._id, users])
 
+    // Helper function to format time
     function formatTime(time) {
         const minutes = Math.floor(time / 60000)
         const seconds = Math.floor((time % 60000) / 1000)
@@ -99,14 +106,17 @@ export function Auction() {
         return { minutes, seconds, clock }
     }
 
+    // Helper function to update expiration time
     function updateExpirationTime(time) {
         return formatTime(time - Date.now()).minutes < 1 ? time + 60 * 1000 : time
     }
 
+    // Helper function to update bidders' IDs
     function updateBiddersIds(biddersIds, userId) {
         return !biddersIds.includes(userId) ? [...biddersIds, userId] : biddersIds
     }
 
+    // Helper function to calculate the bid amount
     function calculateBid(price) {
         let bid = Math.round(price / 5) * 5 + 5
 
@@ -118,6 +128,7 @@ export function Auction() {
         return bid
     }
 
+    // Handling bid on an auction
     async function handleBid(auctionId, price) {
         try {
             const bid = calculateBid(price)
@@ -160,6 +171,7 @@ export function Auction() {
         }
     }
 
+    // Handling cancellation of an auction
     async function handleCancel(auctionId) {
         const auction = auctions.find(a => a._id === auctionId)
 
@@ -183,35 +195,46 @@ export function Auction() {
         }
     }
 
-    return <section> {auctions.map(a => <div className="auctionCard" key={a._id}>
-        <div className="cardInfo">
-            <p className="auctionName"> {a.name} </p>
+    return (
+        <section>
+            {/* Rendering auction cards */}
+            {auctions.map(a => (
+                <div className="auctionCard" key={a._id}>
+                    <div className="cardInfo">
+                        <p className="auctionName">{a.name}</p>
 
-            <p className="auctionDuration">
-                {formatTime(a.expirationTime - Date.now()).clock}
-            </p>
+                        <p className="auctionDuration">
+                            {formatTime(a.expirationTime - Date.now()).clock}
+                        </p>
 
-            <p className="auctionPrice">
-                {user._id === a.ownerId && a.price}
+                        <p className="auctionPrice">
+                            {user._id === a.ownerId && a.price}
 
-                {
-                    user._id !== a.ownerId &&
-                    user._id !== a.highestBidderId && a.price
-                }
+                            {user._id !== a.ownerId &&
+                                user._id !== a.highestBidderId && a.price}
 
-                {
-                    user._id !== a.ownerId &&
-                    user._id === a.highestBidderId && a.price
-                }
-            </p>
-        </div>
+                            {user._id !== a.ownerId &&
+                                user._id === a.highestBidderId && a.price}
+                        </p>
+                    </div>
 
-        {user._id !== a.highestBidderId && user._id !== a.ownerId && <button
-            className="cardButton" onClick={() => handleBid(a._id, a.price)}
-        > Bid </button>}
+                    {/* Render bid button if the user is not the highest bidder or the owner */}
+                    {user._id !== a.highestBidderId && user._id !== a.ownerId && (
+                        <button
+                            className="cardButton"
+                            onClick={() => handleBid(a._id, a.price)}
+                        > Bid </button>
+                    )}
 
-        {user._id === a.ownerId && <button
-            className="cardButton" onClick={() => handleCancel(a._id)}
-        > Cancel </button>}
-    </div>)} </section >
+                    {/* Render cancel button if the user is the owner */}
+                    {user._id === a.ownerId && (
+                        <button
+                            className="cardButton"
+                            onClick={() => handleCancel(a._id)}
+                        > Cancel </button>
+                    )}
+                </div>
+            ))}
+        </section>
+    )
 }

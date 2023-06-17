@@ -6,6 +6,7 @@ import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 
 export function Auth() {
+    // Initial state for form inputs and errors
     const initialState = { username: "", password: "" }
 
     const [inputs, setInputs] = useState(initialState)
@@ -44,6 +45,7 @@ export function Auth() {
         })
     }
 
+    // State for registration/login toggle
     const [isRegistering, setIsRegistering] = useState(true)
 
     const dispatch = useDispatch()
@@ -54,24 +56,30 @@ export function Auth() {
 
         const formData = Object.fromEntries(new FormData(event.target))
 
+        // Check if form data is valid
         if (!Object.values(formData).some(v => !v.trim())) {
             let response = null
 
             if (isRegistering) {
+                // Register user
                 response = await service.register({
                     ...formData,
                     wallet: 10000,
                     wonAuctions: []
                 })
 
+                // If username is taken, try logging in
                 if (response?.message === "Username is taken.") {
                     response = await service.login(formData)
                 }
             } else {
+                // Login user
                 response = await service.login(formData)
             }
 
+            // Handle successful registration/login
             if (response && !response.message) {
+                // Store user data in local storage
                 for (let key in response) {
                     if (key === "wonAuctions") {
                         localStorage.setItem(key, JSON.stringify(response[key]))
@@ -80,58 +88,65 @@ export function Auth() {
                     }
                 }
 
+                // Update user state in Redux store
                 dispatch(userActions.setUser(response))
 
+                // Fetch all users and update user list in Redux store
                 const { users } = await service.readUsers()
-
                 dispatch(usersActions.setUsers(users))
 
+                // Add user to user list if not already present
                 if (users.length > 0 && !users.find(u => u._id === response._id)) {
                     dispatch(usersActions.addUser(response))
                 }
 
+                // Navigate to the main page
                 navigate("/")
             } else if (response && response.message) {
+                // Set server error message
                 setErrors(state => ({ ...state, server: response.message }))
             }
         }
     }
 
-    return <div className="auth">
-        <form onSubmit={handleSubmit}>
-            <input
-                type="text"
-                name="username"
-                placeholder="Username"
-                value={inputs.username}
-                onChange={handleInputChange}
-                onBlur={validateInput}
-            />
+    return (
+        <div className="auth">
+            <form onSubmit={handleSubmit}>
+                {/* Input for username */}
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Username"
+                    value={inputs.username}
+                    onChange={handleInputChange}
+                    onBlur={validateInput}
+                />
 
-            <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={inputs.password}
-                onChange={handleInputChange}
-                onBlur={validateInput}
-            />
+                {/* Input for password */}
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Password"
+                    value={inputs.password}
+                    onChange={handleInputChange}
+                    onBlur={validateInput}
+                />
 
-            {
-                !Object.values(errors).some(entry => entry !== "") &&
-                !Object.values(inputs).some(entry => entry === "") &&
+                {/* Render buttons if there are no errors and inputs are not empty */}
+                {!Object.values(errors).some(entry => entry !== "") && !Object.values(inputs).some(entry => entry === "") && (
+                    <div className="buttonsWrapper">
+                        <button onClick={() => setIsRegistering(true)}>Register</button>
+                        <button onClick={() => setIsRegistering(false)}>Login</button>
+                    </div>
+                )}
+            </form>
 
-                <div className="buttonsWrapper">
-                    <button onClick={() => setIsRegistering(true)}>Register</button>
-                    <button onClick={() => setIsRegistering(false)}>Login</button>
-                </div>
-            }
-        </form>
-
-        <div className="errorsWrapper">
-            {errors.username && <p className="error">{errors.username}</p>}
-            {errors.password && <p className="error">{errors.password}</p>}
-            {errors.server && <p className="error">{errors.server}</p>}
+            {/* Error messages */}
+            <div className="errorsWrapper">
+                {errors.username && <p className="error">{errors.username}</p>}
+                {errors.password && <p className="error">{errors.password}</p>}
+                {errors.server && <p className="error">{errors.server}</p>}
+            </div>
         </div>
-    </div>
+    )
 }
