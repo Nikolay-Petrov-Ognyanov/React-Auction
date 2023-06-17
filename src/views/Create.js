@@ -1,7 +1,10 @@
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import * as service from "../service"
+import * as userActions from "../features/user"
+import * as usersActions from "../features/users"
+import * as auctionsActions from "../features/auctions"
 
 export function Create() {
     const initialState = { name: "", price: "" }
@@ -10,6 +13,9 @@ export function Create() {
     const [errors, setErrors] = useState({ ...initialState, server: "" })
 
     const user = useSelector(state => state.user.value)
+
+    const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     function handleInputChange(event) {
         const { name, value } = event.target
@@ -46,22 +52,30 @@ export function Create() {
         })
     }
 
-    const navigate = useNavigate()
-
     async function handleSave(event) {
         event.preventDefault()
 
-        const formData = Object.fromEntries(new FormData(event.target))
+        const { name, price } = Object.fromEntries(new FormData(event.target))
         const expirationTime = Date.now() + 15 * 60 * 1000
+        const deposit = Math.ceil(price / 20)
+        const userToBeUpdated = { ...user, wallet: user.wallet - deposit }
+
         const auction = {
-            ...formData,
+            name,
+            price,
+            deposit,
             expirationTime,
             ownerId: user._id,
             biddersIds: []
         }
 
         try {
+            await service.updateUser(userToBeUpdated)
             await service.createAuction(auction)
+
+            dispatch(userActions.setUser(userToBeUpdated))
+            dispatch(usersActions.updateUser(userToBeUpdated))
+            dispatch(auctionsActions.updateAuction(auction))
 
             navigate("/")
         } catch (error) {

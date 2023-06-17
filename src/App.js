@@ -5,7 +5,7 @@ import { Auction } from "./views/Auction"
 import { Nav } from "./views/Nav"
 import { Guard } from "./Guard"
 import { Create } from "./views/Create"
-import { Wallet } from "./views/Wallet"
+import { Profile } from "./views/Profile"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import * as userActions from "./features/user"
@@ -15,9 +15,9 @@ export default function App() {
 
 	useEffect(() => {
 		if (localStorage.getItem("accessToken")) {
-			const { _id, accessToken, username, wallet } = localStorage
+			const { _id, accessToken, username, Profile } = localStorage
 
-			dispatch(userActions.setUser({ _id, accessToken, username, wallet }))
+			dispatch(userActions.setUser({ _id, accessToken, username, Profile }))
 		}
 	}, [dispatch])
 
@@ -30,7 +30,7 @@ export default function App() {
 			<Route element={<Guard />}>
 				<Route path="/" element={<Auction />} />
 				<Route path="/create" element={<Create />} />
-				<Route path="/wallet" element={<Wallet />} />
+				<Route path="/profile" element={<Profile />} />
 				<Route path="*" element={<Auction />} />
 			</Route>
 		</Routes>

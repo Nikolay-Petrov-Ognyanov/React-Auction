@@ -21,7 +21,7 @@ export function Nav() {
     return <> {localStorage.getItem("username") ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Auction</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
-        <NavLink to={"/wallet"} className="button" activeclassname="active">Wallet</NavLink>
+        <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>
         <button onClick={handleLogout}>Logout</button>
     </nav> : <h1>Sign in</h1>} </>
 }

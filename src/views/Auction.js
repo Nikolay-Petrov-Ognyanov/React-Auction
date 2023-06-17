@@ -88,7 +88,7 @@ export function Auction() {
 
                 dispatch(usersActions.updateUser(previousBidderToBeRepaid))
             }
-            
+
             const auctionToBeUpdated = {
                 ...auctionFromServer,
                 price: bid,
@@ -98,13 +98,13 @@ export function Auction() {
                 previousBidderId: auctionFromServer.highestBidderId || ""
             }
 
-            const hgihestBidderToBeUpdated = { ...user, wallet: user.wallet - Math.ceil(bid) }
+            const highestBidderToBeUpdated = { ...user, wallet: user.wallet - Math.ceil(bid) }
 
             await service.updateAuction(auctionId, auctionToBeUpdated)
-            await service.updateUser(hgihestBidderToBeUpdated)
+            await service.updateUser(highestBidderToBeUpdated)
 
-            dispatch(userActions.setUser(hgihestBidderToBeUpdated))
-            dispatch(usersActions.updateUser(hgihestBidderToBeUpdated))
+            dispatch(userActions.setUser(highestBidderToBeUpdated))
+            dispatch(usersActions.updateUser(highestBidderToBeUpdated))
             dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
         } catch (error) {
             console.error(error)
