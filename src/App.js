@@ -15,9 +15,21 @@ export default function App() {
 
 	useEffect(() => {
 		if (localStorage.getItem("accessToken")) {
-			const { _id, accessToken, username, wallet } = localStorage
+			const {
+				_id,
+				accessToken,
+				username,
+				wallet,
+				wonAuctions
+			} = localStorage
 
-			dispatch(userActions.setUser({ _id, accessToken, username, wallet }))
+			dispatch(userActions.setUser({
+				_id,
+				accessToken,
+				username,
+				wallet,
+				wonAuctions: wonAuctions && JSON.parse(wonAuctions) || []
+			}))
 		}
 	}, [dispatch])
 

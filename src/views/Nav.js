@@ -9,7 +9,9 @@ export function Nav() {
     const user = useSelector(state => state.user.value)
 
     async function handleLogout() {
-        await service.logout({ accessToken: user.accessToken })
+        await service.logout({
+            accessToken: user.accessToken
+        })
 
         dispatch(setUser({}))
 

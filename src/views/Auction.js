@@ -33,14 +33,12 @@ export function Auction() {
                 const result = await service.readAuctions()
                 const { auctions } = result
 
-                console.log(auctions)
-
                 auctions.forEach(async auction => {
                     if (auction.expirationTime > Date.now()) return
 
                     const buyer = users.find(u => u._id === auction.highestBidderId)
 
-                    if (buyer) {
+                    if (buyer && !buyer.wonAuctions.includes(auction)) {
                         const seller = users.find(u => u._id === auction.ownerId)
                         const tax = Math.ceil(auction.price / 20) - auction.deposit
                         const amountToBePaidToSeller = auction.price - tax
@@ -57,12 +55,17 @@ export function Auction() {
 
                         await service.updateUser(sellerToBePaid)
                         await service.updateUser(buyerToBeAwarded)
-                        
+
                         if (user._id === seller._id) {
                             dispatch(userActions.setUser(sellerToBePaid))
                         }
 
                         if (user._id === buyer._id) {
+                            localStorage.setItem("wonAuctions", JSON.stringify([
+                                ...buyer.wonAuctions,
+                                auction
+                            ]))
+
                             dispatch(userActions.setUser(buyerToBeAwarded))
                         }
 
@@ -97,7 +100,7 @@ export function Auction() {
     }
 
     function updateExpirationTime(time) {
-        return formatTime(time - Date.now()).minutes < 4 ? time + 60 * 1000 : time
+        return formatTime(time - Date.now()).minutes < 1 ? time + 60 * 1000 : time
     }
 
     function updateBiddersIds(biddersIds, userId) {
@@ -143,7 +146,7 @@ export function Auction() {
 
             const highestBidderToBeUpdated = {
                 ...user,
-                wallet: user.wallet - Math.ceil(bid)
+                wallet: user.wallet - Math.ceil(price)
             }
 
             await service.updateAuction(auctionId, auctionToBeUpdated)
@@ -193,7 +196,7 @@ export function Auction() {
 
                 {
                     user._id !== a.ownerId &&
-                    user._id !== a.highestBidderId && calculateBid(a.price)
+                    user._id !== a.highestBidderId && a.price
                 }
 
                 {

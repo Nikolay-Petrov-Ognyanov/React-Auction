@@ -56,7 +56,7 @@ export function Create() {
         event.preventDefault()
 
         const { name, price } = Object.fromEntries(new FormData(event.target))
-        const expirationTime = Date.now() + 5 * 60 * 1000
+        const expirationTime = Date.now() + 2 * 60 * 1000
         const deposit = Math.ceil(price / 20)
         const walletToBeUpdated = user.wallet - deposit
         const userToBeUpdated = { ...user, wallet: walletToBeUpdated }

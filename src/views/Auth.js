@@ -73,7 +73,11 @@ export function Auth() {
 
             if (response && !response.message) {
                 for (let key in response) {
-                    localStorage.setItem(key, response[key])
+                    if (key === "wonAuctions") {
+                        localStorage.setItem(key, JSON.stringify(response[key]))
+                    } else {
+                        localStorage.setItem(key, response[key])
+                    }
                 }
 
                 dispatch(userActions.setUser(response))
