@@ -13,7 +13,7 @@ export function Nav() {
             accessToken: user.accessToken
         })
 
-        dispatch(setUser({}))
+        dispatch(setUser(null))
 
         localStorage.clear()
 

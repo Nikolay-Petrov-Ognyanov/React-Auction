@@ -58,53 +58,57 @@ export function Auth() {
 
         // Check if form data is valid
         if (!Object.values(formData).some(v => !v.trim())) {
-            let response = null
+            try {
+                let response = null
 
-            if (isRegistering) {
-                // Register user
-                response = await service.register({
-                    ...formData,
-                    wallet: 10000,
-                    wonAuctions: []
-                })
+                if (isRegistering) {
+                    // Register user
+                    response = await service.register({
+                        ...formData,
+                        wallet: 10000,
+                        wonAuctions: []
+                    })
 
-                // If username is taken, try logging in
-                if (response?.message === "Username is taken.") {
+                    // If username is taken, try logging in
+                    if (response?.message === "Username is taken.") {
+                        response = await service.login(formData)
+                    }
+                } else {
+                    // Login user
                     response = await service.login(formData)
                 }
-            } else {
-                // Login user
-                response = await service.login(formData)
-            }
 
-            // Handle successful registration/login
-            if (response && !response.message) {
-                // Store user data in local storage
-                for (let key in response) {
-                    if (key === "wonAuctions") {
-                        localStorage.setItem(key, JSON.stringify(response[key]))
-                    } else {
-                        localStorage.setItem(key, response[key])
+                if (response && !response.message) {
+                    if (response.wallet <= 0) {
+                        response = { ...response, wallet: 10000 }
+
+                        await service.updateUser(response)
                     }
+
+                    // Store user data in local storage
+                    for (let key in response) {
+                        if (key === "wonAuctions") {
+                            localStorage.setItem(key, JSON.stringify(response[key]))
+                        } else {
+                            localStorage.setItem(key, response[key])
+                        }
+                    }
+
+                    dispatch(userActions.setUser(response))
+
+                    const { users } = await service.readUsers()
+                    dispatch(usersActions.setUsers(users))
+
+                    if (users.length > 0 && !users.find(u => u._id === response._id)) {
+                        dispatch(usersActions.addUser(response))
+                    }
+
+                    navigate("/")
+                } else if (response && response.message) {
+                    setErrors(state => ({ ...state, server: response.message }))
                 }
-
-                // Update user state in Redux store
-                dispatch(userActions.setUser(response))
-
-                // Fetch all users and update user list in Redux store
-                const { users } = await service.readUsers()
-                dispatch(usersActions.setUsers(users))
-
-                // Add user to user list if not already present
-                if (users.length > 0 && !users.find(u => u._id === response._id)) {
-                    dispatch(usersActions.addUser(response))
-                }
-
-                // Navigate to the main page
-                navigate("/")
-            } else if (response && response.message) {
-                // Set server error message
-                setErrors(state => ({ ...state, server: response.message }))
+            } catch (error) {
+                console.error(error)
             }
         }
     }
@@ -112,7 +116,6 @@ export function Auth() {
     return (
         <div className="auth">
             <form onSubmit={handleSubmit}>
-                {/* Input for username */}
                 <input
                     type="text"
                     name="username"
@@ -122,7 +125,6 @@ export function Auth() {
                     onBlur={validateInput}
                 />
 
-                {/* Input for password */}
                 <input
                     type="password"
                     name="password"
@@ -132,7 +134,6 @@ export function Auth() {
                     onBlur={validateInput}
                 />
 
-                {/* Render buttons if there are no errors and inputs are not empty */}
                 {!Object.values(errors).some(entry => entry !== "") && !Object.values(inputs).some(entry => entry === "") && (
                     <div className="buttonsWrapper">
                         <button onClick={() => setIsRegistering(true)}>Register</button>
@@ -141,7 +142,6 @@ export function Auth() {
                 )}
             </form>
 
-            {/* Error messages */}
             <div className="errorsWrapper">
                 {errors.username && <p className="error">{errors.username}</p>}
                 {errors.password && <p className="error">{errors.password}</p>}
