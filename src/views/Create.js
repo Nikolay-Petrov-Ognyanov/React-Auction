@@ -7,17 +7,14 @@ import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
 
 export function Create() {
-    // Initial state for form inputs and errors
-    const initialState = { name: "", price: "" }
-
-    const [inputs, setInputs] = useState(initialState)
-    const [errors, setErrors] = useState({ ...initialState, server: "" })
-
     // Get user data from Redux store
     const user = useSelector(state => state.user.value)
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const [inputs, setInputs] = useState({ name: "", price: 0 })
+    const [errors, setErrors] = useState({ name: "", price: "", server: "" })
 
     // Handles input change in the form
     function handleInputChange(event) {
@@ -128,9 +125,9 @@ export function Create() {
 
                     <div className="buttonsWrapper">
                         <button type="submit">Save</button>
-                        <button type="reset" onClick={() => setInputs(initialState)}>
-                            Reset
-                        </button>
+                        <button type="reset" onClick={() => {
+                            setInputs({ name: "", price: 0 })
+                        }}> Reset </button>
                     </div>
                 }
             </form>

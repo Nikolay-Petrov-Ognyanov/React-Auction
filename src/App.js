@@ -7,14 +7,16 @@ import { Guard } from "./Guard"
 import { Create } from "./views/Create"
 import { Profile } from "./views/Profile"
 import { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import * as userActions from "./features/user"
 
 export default function App() {
 	const dispatch = useDispatch()
 
+	const user = useSelector(state => state.user.value)
+
 	useEffect(() => {
-		if (localStorage.getItem("accessToken")) {
+		if (!user && localStorage.getItem("accessToken")) {
 			const {
 				_id,
 				accessToken,
@@ -30,7 +32,7 @@ export default function App() {
 				wallet,
 				wonAuctions: wonAuctions && JSON.parse(wonAuctions) || []
 			}))
-		}
+		} 
 	}, [dispatch])
 
 	return <div className="App">
