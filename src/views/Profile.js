@@ -1,18 +1,18 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import * as service from "../service"
-import * as userActions from "../features/user"
-import * as usersActions from "../features/users"
+import * as service from "../service" // Importing a service module
+import * as userActions from "../features/user" // Importing user-related actions
+import * as usersActions from "../features/users" // Importing users-related actions
 
 export function Profile() {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch() // Accessing the Redux dispatch function
 
-    const user = useSelector(state => state.user.value)
+    const user = useSelector(state => state.user.value) // Accessing the user state from Redux store
 
-    const [isDepositing, setIsDepositing] = useState(true)
+    const [isDepositing, setIsDepositing] = useState(true) // State for tracking deposit/withdrawal
 
-    const [input, setInput] = useState({ amount: 0 })
-    const [error, setError] = useState({ amount: "", server: "" })
+    const [input, setInput] = useState({ amount: 0 }) // State for input values
+    const [error, setError] = useState({ amount: "", server: "" }) // State for error messages
 
     // Handles input change in the form
     function handleInputChange(event) {
@@ -45,6 +45,7 @@ export function Profile() {
         })
     }
 
+    // Handles form submission
     async function handleSubmit(event) {
         event.preventDefault()
 
@@ -60,10 +61,7 @@ export function Profile() {
             if (walletToBeUpdated >= 9999999999) {
                 walletToBeUpdated = 9999999999
             }
-        }
-
-
-        else if (!isDepositing) {
+        } else if (!isDepositing) {
             walletToBeUpdated = userWallet - Number(amount)
 
             if (walletToBeUpdated <= 0 || typeof Number(walletToBeUpdated) !== "number") {
@@ -83,6 +81,7 @@ export function Profile() {
         }
     }
 
+    // Render the component
     return user && <section>
         {user.wallet}
 
@@ -100,6 +99,7 @@ export function Profile() {
             />
 
             {
+                // Render buttons only when there are no input or validation errors
                 !Object.values(error).some(entry => entry !== "") &&
                 !Object.values(input).some(entry => entry === "") &&
 
