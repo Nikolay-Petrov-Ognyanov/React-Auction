@@ -39,7 +39,9 @@ export function Create() {
                 } else if (value.length > 10) {
                     stateObject[name] = "Name can be at most 10 characters long."
                 }
-            } else if (name === "price") {
+            }
+
+            if (name === "price") {
                 if (!value) {
                     stateObject[name] = "Price is required."
                 } else if (!Number.isInteger(Number(value))) {
@@ -58,7 +60,7 @@ export function Create() {
 
         const { name, price } = Object.fromEntries(new FormData(event.target))
 
-        const expirationTime = Date.now() + 2 * 60 * 1000
+        const expirationTime = Date.now() + 5 * 60 * 1000
         const deposit = Math.ceil(price / 20)
         const walletToBeUpdated = user.wallet - deposit
         const userToBeUpdated = { ...user, wallet: walletToBeUpdated }

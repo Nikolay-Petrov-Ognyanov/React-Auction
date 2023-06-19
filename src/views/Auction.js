@@ -86,7 +86,7 @@ export function Auction() {
 			try {
 				dispatch(usersActions.setUsers(await service.readUsers().users))
 			} catch (error) {
-				console.error(error)
+				console.log(error)
 			}
 		}
 
@@ -119,15 +119,12 @@ export function Auction() {
 							wonAuctions: [...buyer.wonAuctions, auction]
 						}
 
-						// Updating user and dispatching actions
 						await service.updateUser(sellerToBePaid)
 						await service.updateUser(buyerToBeAwarded)
 
 						if (user._id === seller._id) {
 							dispatch(userActions.setUser(sellerToBePaid))
-						}
-
-						if (user._id === buyer._id) {
+						} else if (user._id === buyer._id) {
 							localStorage.setItem("wonAuctions", JSON.stringify([
 								...buyer.wonAuctions,
 								auction
@@ -154,7 +151,7 @@ export function Auction() {
 					dispatch(auctionsActions.setAuctions(auctions))
 				}
 			} catch (error) {
-				console.error(error)
+				console.log(error)
 			}
 		}
 
@@ -174,7 +171,7 @@ export function Auction() {
 	}
 
 	function updateExpirationTime(time) {
-		return formatTime(time - Date.now()).minutes < 1 ? time + 60 * 1000 : time
+		return formatTime(time - Date.now()).minutes < 4 ? time + 60 * 1000 : time
 	}
 
 	function updateBiddersIds(biddersIds, userId) {
@@ -230,7 +227,7 @@ export function Auction() {
 			dispatch(usersActions.updateUser(highestBidderToBeUpdated))
 			dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
 		} catch (error) {
-			console.error(error)
+			console.log(error)
 		}
 	}
 
@@ -292,22 +289,11 @@ export function Auction() {
 							{formatTime(a.expirationTime - Date.now()).clock}
 						</p>
 
-						<p className="auctionPrice">
-							{user._id === a.ownerId && a.price}
-
-							{
-								user._id !== a.ownerId &&
-								user._id !== a.highestBidderId && a.price
-							}
-
-							{
-								user._id !== a.ownerId &&
-								user._id === a.highestBidderId && a.price
-							}
-						</p>
+						<p className="auctionPrice"> {a.price} </p>
 					</div>
 
-					{user._id !== a.highestBidderId && user._id !== a.ownerId &&
+					{
+						user._id !== a.highestBidderId && user._id !== a.ownerId &&
 						<button className="cardButton"
 							onClick={() => handleBid(a._id, a.price)}
 						> Bid </button>

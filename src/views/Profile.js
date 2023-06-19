@@ -1,19 +1,19 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import * as service from "../service" 
-import * as userActions from "../features/user" 
-import * as usersActions from "../features/users" 
+import * as service from "../service"
+import * as userActions from "../features/user"
+import * as usersActions from "../features/users"
 
 export function Profile() {
-    const dispatch = useDispatch() 
+    const dispatch = useDispatch()
 
-    const user = useSelector(state => state.user.value) 
+    const user = useSelector(state => state.user.value)
 
-    const [isDepositing, setIsDepositing] = useState(true) 
+    const [isDepositing, setIsDepositing] = useState(true)
 
-    const [input, setInput] = useState({ amount: "" }) 
-    const [error, setError] = useState({ amount: "", server: "" }) 
-    
+    const [input, setInput] = useState({ amount: "" })
+    const [error, setError] = useState({ amount: "", server: "" })
+
     function handleInputChange(event) {
         const { name, value } = event.target
 
@@ -22,7 +22,7 @@ export function Profile() {
 
         validateInput(event)
     }
-    
+
     function validateInput(event) {
         const { name, value } = event.target
 
@@ -42,7 +42,7 @@ export function Profile() {
             return stateObject
         })
     }
-    
+
     async function handleSubmit(event) {
         event.preventDefault()
 
@@ -73,10 +73,10 @@ export function Profile() {
             dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
             dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
         } catch (error) {
-            console.error(error)
+            console.log(error)
         }
     }
-    
+
     return user && <section>
         <p> Balance: {user.wallet} </p>
 

@@ -101,7 +101,7 @@ export function Auth() {
                     setErrors(state => ({ ...state, server: response.message }))
                 }
             } catch (error) {
-                console.error(error)
+                console.log(error)
             }
         }
     }
