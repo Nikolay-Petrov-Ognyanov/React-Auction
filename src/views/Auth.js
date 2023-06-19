@@ -6,7 +6,6 @@ import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 
 export function Auth() {
-    // Initial state for form inputs and errors
     const initialState = { username: "", password: "" }
 
     const [inputs, setInputs] = useState(initialState)
@@ -45,7 +44,6 @@ export function Auth() {
         })
     }
 
-    // State for registration/login toggle
     const [isRegistering, setIsRegistering] = useState(true)
 
     const dispatch = useDispatch()
@@ -56,25 +54,21 @@ export function Auth() {
 
         const formData = Object.fromEntries(new FormData(event.target))
 
-        // Check if form data is valid
         if (!Object.values(formData).some(v => !v.trim())) {
             try {
                 let response = null
 
                 if (isRegistering) {
-                    // Register user
                     response = await service.register({
                         ...formData,
                         wallet: 10000,
                         wonAuctions: []
                     })
 
-                    // If username is taken, try logging in
                     if (response?.message === "Username is taken.") {
                         response = await service.login(formData)
                     }
                 } else {
-                    // Login user
                     response = await service.login(formData)
                 }
 
@@ -85,7 +79,6 @@ export function Auth() {
                         await service.updateUser(response)
                     }
 
-                    // Store user data in local storage
                     for (let key in response) {
                         if (key === "wonAuctions") {
                             localStorage.setItem(key, JSON.stringify(response[key]))

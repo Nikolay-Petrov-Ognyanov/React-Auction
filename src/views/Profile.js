@@ -1,20 +1,19 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import * as service from "../service" // Importing a service module
-import * as userActions from "../features/user" // Importing user-related actions
-import * as usersActions from "../features/users" // Importing users-related actions
+import * as service from "../service" 
+import * as userActions from "../features/user" 
+import * as usersActions from "../features/users" 
 
 export function Profile() {
-    const dispatch = useDispatch() // Accessing the Redux dispatch function
+    const dispatch = useDispatch() 
 
-    const user = useSelector(state => state.user.value) // Accessing the user state from Redux store
+    const user = useSelector(state => state.user.value) 
 
-    const [isDepositing, setIsDepositing] = useState(true) // State for tracking deposit/withdrawal
+    const [isDepositing, setIsDepositing] = useState(true) 
 
-    const [input, setInput] = useState({ amount: 0 }) // State for input values
-    const [error, setError] = useState({ amount: "", server: "" }) // State for error messages
-
-    // Handles input change in the form
+    const [input, setInput] = useState({ amount: "" }) 
+    const [error, setError] = useState({ amount: "", server: "" }) 
+    
     function handleInputChange(event) {
         const { name, value } = event.target
 
@@ -23,8 +22,7 @@ export function Profile() {
 
         validateInput(event)
     }
-
-    // Validates the input values
+    
     function validateInput(event) {
         const { name, value } = event.target
 
@@ -32,7 +30,7 @@ export function Profile() {
             const stateObject = { ...state, [name]: "" }
 
             if (name === "amount") {
-                if (!value) {
+                if (!value || value == 0) {
                     stateObject[name] = "Amount is required."
                 } else if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Amount must be a whole number."
@@ -44,16 +42,14 @@ export function Profile() {
             return stateObject
         })
     }
-
-    // Handles form submission
+    
     async function handleSubmit(event) {
         event.preventDefault()
 
         const { amount } = Object.fromEntries(new FormData(event.target))
+        const userWallet = Number(user.wallet) || 0
 
         let walletToBeUpdated = 0
-
-        const userWallet = Number(user.wallet) || 0
 
         if (isDepositing) {
             walletToBeUpdated = userWallet + Number(amount)
@@ -80,10 +76,9 @@ export function Profile() {
             console.error(error)
         }
     }
-
-    // Render the component
+    
     return user && <section>
-        {user.wallet}
+        <p> Balance: {user.wallet} </p>
 
         {user.wonAuctions.length > 0 && user.wonAuctions.map(auction => (
             <p key={auction._id}>  {auction.name} </p>
@@ -93,19 +88,22 @@ export function Profile() {
             <input
                 type="number"
                 name="amount"
+                placeholder="Amount"
                 value={input.amount}
                 onChange={handleInputChange}
                 onBlur={validateInput}
             />
 
             {
-                // Render buttons only when there are no input or validation errors
                 !Object.values(error).some(entry => entry !== "") &&
-                !Object.values(input).some(entry => entry === "") &&
+                !Object.values(input).some(entry => entry === "" || entry === 0) &&
 
                 <div className="buttonsWrapper">
-                    <button type="submit" onClick={() => setIsDepositing(true)}>Deposit</button>
-                    <button type="submit" onClick={() => setIsDepositing(false)}>Withdraw</button>
+                    <button type="submit" onClick={() => setIsDepositing(true)}
+                    >Deposit</button>
+
+                    <button type="submit" onClick={() => setIsDepositing(false)}
+                    >Withdraw</button>
                 </div>
             }
         </form>

@@ -13,7 +13,7 @@ export function Create() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const [inputs, setInputs] = useState({ name: "", price: 0 })
+    const [inputs, setInputs] = useState({ name: "", price: "" })
     const [errors, setErrors] = useState({ name: "", price: "", server: "" })
 
     // Handles input change in the form
@@ -53,13 +53,11 @@ export function Create() {
         })
     }
 
-    // Handles the form submission
     async function handleSave(event) {
         event.preventDefault()
 
         const { name, price } = Object.fromEntries(new FormData(event.target))
 
-        // Calculate auction details
         const expirationTime = Date.now() + 2 * 60 * 1000
         const deposit = Math.ceil(price / 20)
         const walletToBeUpdated = user.wallet - deposit
@@ -75,22 +73,17 @@ export function Create() {
         }
 
         try {
-            // Update user's wallet and create the auction
             await service.updateUser(userToBeUpdated)
             await service.createAuction(auction)
 
-            // Update wallet in local storage
             localStorage.setItem("wallet", walletToBeUpdated)
 
-            // Update user, user list, and auction in Redux store
             dispatch(userActions.setUser(userToBeUpdated))
             dispatch(usersActions.updateUser(userToBeUpdated))
             dispatch(auctionsActions.updateAuction(auction))
 
-            // Navigate to the main page
             navigate("/")
         } catch (error) {
-            // Set server error message
             setErrors(state => (state.server = error.message))
         }
     }
@@ -98,7 +91,6 @@ export function Create() {
     return (
         <section>
             <form onSubmit={handleSave}>
-                {/* Input for name */}
                 <input
                     type="text"
                     name="name"
@@ -108,7 +100,6 @@ export function Create() {
                     onBlur={validateInput}
                 />
 
-                {/* Input for price */}
                 <input
                     type="number"
                     name="price"
@@ -118,7 +109,6 @@ export function Create() {
                     onBlur={validateInput}
                 />
 
-                {/* Save and Reset buttons */}
                 {
                     !Object.values(errors).some(entry => entry !== "") &&
                     !Object.values(inputs).some(entry => entry === "") &&
@@ -132,7 +122,6 @@ export function Create() {
                 }
             </form>
 
-            {/* Error messages */}
             <div className="errorsWrapper">
                 {errors.name && <p className="error">{errors.name}</p>}
                 {errors.price && <p className="error">{errors.price}</p>}

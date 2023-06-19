@@ -28,8 +28,8 @@ input[type=number] {
 .App * {
 	text-align: center;
 	background-color: black;
-  color: var(--color);
-  border-color: var(--color);
+	color: var(--color);
+	border-color: var(--color);
 	border-radius: 4vw;
 	outline: none;
 }
@@ -86,14 +86,14 @@ button,
 button:hover,
 .button:hover {
 	cursor: pointer;
-  background-color: var(--color);
-  border-color: var(--color);
+	background-color: var(--color);
+	border-color: var(--color);
 	color: black;
 }
 
-.button.active {
-  background-color: var(--color);
-  border-color: var(--color);
+.active {
+	background-color: var(--color);
+	border-color: var(--color);
 	color: black;
 }
 
@@ -145,4 +145,17 @@ form {
 
 .cardButton {
 	border: none;
+}
+
+.searchBar {
+	width: 96vw;
+	margin-bottom: 2vw;
+	margin-top: 0.5vw;
+}
+
+header {
+	width: 96vw;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 2vw;
 }
