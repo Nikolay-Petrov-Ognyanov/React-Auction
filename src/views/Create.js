@@ -39,9 +39,7 @@ export function Create() {
                 } else if (value.length > 10) {
                     stateObject[name] = "Name can be at most 10 characters long."
                 }
-            }
-
-            if (name === "price") {
+            } else if (name === "price") {
                 if (!value) {
                     stateObject[name] = "Price is required."
                 } else if (!Number.isInteger(Number(value))) {
@@ -73,10 +71,10 @@ export function Create() {
             ownerId: user._id,
             biddersIds: []
         }
+        const response = await service.createAuction(auction)
 
-        try {
+        if (!response.message) {
             await service.updateUser(userToBeUpdated)
-            await service.createAuction(auction)
 
             localStorage.setItem("wallet", walletToBeUpdated)
 
@@ -85,8 +83,8 @@ export function Create() {
             dispatch(auctionsActions.updateAuction(auction))
 
             navigate("/")
-        } catch (error) {
-            setErrors(state => (state.server = error.message))
+        } else {
+            setErrors({ ...errors, server: response.message })
         }
     }
 

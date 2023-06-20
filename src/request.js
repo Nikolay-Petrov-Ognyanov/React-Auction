@@ -21,12 +21,14 @@ async function requester(url, method, data) {
 
     try {
         const response = await makeRequest(url, method, data)
-        const result = response.status !== 204 && await response.json()
 
-        return result || response
+        if (response.message) {
+            console.log(response.message)
+        } else if (response.status !== 204) {
+            return await response.json()
+        }
     } catch (error) {
         console.log(error)
-
     }
 }
 

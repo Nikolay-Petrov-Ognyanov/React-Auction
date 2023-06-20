@@ -65,24 +65,18 @@ export function Profile() {
             }
         }
 
-        try {
-            await service.updateUser({ ...user, wallet: walletToBeUpdated })
+        await service.updateUser({ ...user, wallet: walletToBeUpdated })
 
-            localStorage.setItem("wallet", walletToBeUpdated)
+        localStorage.setItem("wallet", walletToBeUpdated)
 
-            dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
-            dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
-        } catch (error) {
-            console.log(error)
-        }
+        dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
+        dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
     }
 
     return user && <section>
         <p> Balance: {user.wallet} </p>
 
-        {user.wonAuctions.length > 0 && user.wonAuctions.map(auction => (
-            <p key={auction._id}>  {auction.name} </p>
-        ))}
+        <p>Won auctions: {user.wonAuctions.length > 0 && user.wonAuctions.length} </p>
 
         <form onSubmit={handleSubmit} className="amount">
             <input

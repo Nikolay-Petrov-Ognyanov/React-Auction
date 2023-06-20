@@ -83,11 +83,7 @@ export function Auction() {
 
 	useEffect(() => {
 		async function fetchUsers() {
-			try {
-				dispatch(usersActions.setUsers(await service.readUsers().users))
-			} catch (error) {
-				console.log(error)
-			}
+			dispatch(usersActions.setUsers(await service.readUsers().users))
 		}
 
 		fetchUsers()
@@ -95,63 +91,59 @@ export function Auction() {
 
 	useEffect(() => {
 		async function fetchAuctions() {
-			try {
-				const result = await service.readAuctions()
-				const { auctions } = result
+			const result = await service.readAuctions()
+			const { auctions } = result
 
-				auctions.forEach(async auction => {
-					if (auction.expirationTime > Date.now()) return
+			auctions.forEach(async auction => {
+				if (auction.expirationTime > Date.now()) return
 
-					const buyer = users.find(u => u._id === auction.highestBidderId)
+				const buyer = users.find(u => u._id === auction.highestBidderId)
 
-					if (buyer && !buyer.wonAuctions.includes(auction)) {
-						const seller = users.find(u => u._id === auction.ownerId)
-						const tax = Math.ceil(auction.price / 20) - auction.deposit
-						const amountToBePaidToSeller = auction.price - tax
+				if (buyer && !buyer.wonAuctions.includes(auction)) {
+					const seller = users.find(u => u._id === auction.ownerId)
+					const tax = Math.ceil(auction.lastBid / 20) - auction.deposit
+					const amountToBePaidToSeller = auction.lastBid - tax
 
-						const sellerToBePaid = {
-							...seller,
-							wallet: seller.wallet + amountToBePaidToSeller
-						}
-
-						const buyerToBeAwarded = {
-							...buyer,
-							wonAuctions: [...buyer.wonAuctions, auction]
-						}
-
-						await service.updateUser(sellerToBePaid)
-						await service.updateUser(buyerToBeAwarded)
-
-						if (user._id === seller._id) {
-							dispatch(userActions.setUser(sellerToBePaid))
-						} else if (user._id === buyer._id) {
-							localStorage.setItem("wonAuctions", JSON.stringify([
-								...buyer.wonAuctions,
-								auction
-							]))
-
-							dispatch(userActions.setUser(buyerToBeAwarded))
-						}
-
-						dispatch(usersActions.updateUser(sellerToBePaid))
-						dispatch(usersActions.updateUser(buyerToBeAwarded))
+					const sellerToBePaid = {
+						...seller,
+						wallet: seller.wallet + amountToBePaidToSeller
 					}
 
-					await service.deleteAuction(auction._id)
+					const buyerToBeAwarded = {
+						...buyer,
+						wonAuctions: [...buyer.wonAuctions, auction]
+					}
 
-					dispatch(auctionsActions.deleteAuction(auction._id))
-				})
+					await service.updateUser(sellerToBePaid)
+					await service.updateUser(buyerToBeAwarded)
 
-				if (localStorage.getItem("sortingCriteria")) {
-					const [name, order] = JSON.parse(localStorage.getItem("sortingCriteria"))
+					if (user._id === seller._id) {
+						dispatch(userActions.setUser(sellerToBePaid))
+					} else if (user._id === buyer._id) {
+						localStorage.setItem("wonAuctions", JSON.stringify([
+							...buyer.wonAuctions,
+							auction
+						]))
 
-					setActiveButton(name)
-					dispatch(auctionsActions.setAuctions(sortAuctions(auctions, name, order)))
-				} else {
-					dispatch(auctionsActions.setAuctions(auctions))
+						dispatch(userActions.setUser(buyerToBeAwarded))
+					}
+
+					dispatch(usersActions.updateUser(sellerToBePaid))
+					dispatch(usersActions.updateUser(buyerToBeAwarded))
 				}
-			} catch (error) {
-				console.log(error)
+
+				await service.deleteAuction(auction._id)
+
+				dispatch(auctionsActions.deleteAuction(auction._id))
+			})
+
+			if (localStorage.getItem("sortingCriteria")) {
+				const [name, order] = JSON.parse(localStorage.getItem("sortingCriteria"))
+
+				setActiveButton(name)
+				dispatch(auctionsActions.setAuctions(sortAuctions(auctions, name, order)))
+			} else {
+				dispatch(auctionsActions.setAuctions(auctions))
 			}
 		}
 
@@ -190,45 +182,42 @@ export function Auction() {
 	}
 
 	async function handleBid(auctionId, price) {
-		try {
-			const bid = calculateBid(price)
-			const auctionFromServer = auctions.find(a => a._id === auctionId)
-			const previousBidder = users.find(u => u._id === auctionFromServer.highestBidderId)
+		const bid = calculateBid(price)
+		const auctionFromServer = auctions.find(a => a._id === auctionId)
+		const previousBidder = users.find(u => u._id === auctionFromServer.highestBidderId)
 
-			if (previousBidder) {
-				const previousBidderToBeRepaid = {
-					...previousBidder,
-					wallet: previousBidder.wallet + auctionFromServer.price
-				}
-
-				await service.updateUser(previousBidderToBeRepaid)
-
-				dispatch(usersActions.updateUser(previousBidderToBeRepaid))
+		if (previousBidder) {
+			const previousBidderToBeRepaid = {
+				...previousBidder,
+				wallet: previousBidder.wallet + auctionFromServer.lastBid
 			}
 
-			const auctionToBeUpdated = {
-				...auctionFromServer,
-				price: bid,
-				expirationTime: updateExpirationTime(auctionFromServer.expirationTime),
-				biddersIds: updateBiddersIds(auctionFromServer.biddersIds, user._id),
-				highestBidderId: user._id,
-				previousBidderId: auctionFromServer.highestBidderId || ""
-			}
+			await service.updateUser(previousBidderToBeRepaid)
 
-			const highestBidderToBeUpdated = {
-				...user,
-				wallet: user.wallet - Math.ceil(price)
-			}
-
-			await service.updateAuction(auctionId, auctionToBeUpdated)
-			await service.updateUser(highestBidderToBeUpdated)
-
-			dispatch(userActions.setUser(highestBidderToBeUpdated))
-			dispatch(usersActions.updateUser(highestBidderToBeUpdated))
-			dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
-		} catch (error) {
-			console.log(error)
+			dispatch(usersActions.updateUser(previousBidderToBeRepaid))
 		}
+
+		const auctionToBeUpdated = {
+			...auctionFromServer,
+			price: bid,
+			expirationTime: updateExpirationTime(auctionFromServer.expirationTime),
+			biddersIds: updateBiddersIds(auctionFromServer.biddersIds, user._id),
+			highestBidderId: user._id,
+			previousBidderId: auctionFromServer.highestBidderId || "",
+			lastBid: auctionFromServer.price,
+		}
+
+		const highestBidderToBeUpdated = {
+			...user,
+			wallet: user.wallet - Math.ceil(price)
+		}
+
+		await service.updateAuction(auctionId, auctionToBeUpdated)
+		await service.updateUser(highestBidderToBeUpdated)
+
+		dispatch(userActions.setUser(highestBidderToBeUpdated))
+		dispatch(usersActions.updateUser(highestBidderToBeUpdated))
+		dispatch(auctionsActions.updateAuction(auctionToBeUpdated))
 	}
 
 	async function handleCancel(auctionId) {
@@ -289,20 +278,18 @@ export function Auction() {
 							{formatTime(a.expirationTime - Date.now()).clock}
 						</p>
 
-						<p className="auctionPrice"> {a.price} </p>
+						<p className="auctionPrice">
+							{a.ownerId === user._id ? a.lastBid : a.price}
+						</p>
 					</div>
 
-					{
-						user._id !== a.highestBidderId && user._id !== a.ownerId &&
-						<button className="cardButton"
-							onClick={() => handleBid(a._id, a.price)}
-						> Bid </button>
-					}
+					{user._id !== a.highestBidderId && user._id !== a.ownerId && <button
+						className="cardButton" onClick={() => handleBid(a._id, a.price)}
+					>Bid</button>}
 
-					{user._id === a.ownerId &&
-						<button className="cardButton" onClick={() => handleCancel(a._id)}
-						> Cancel </button>
-					}
+					{user._id === a.ownerId && <button
+						className="cardButton" onClick={() => handleCancel(a._id)}
+					>Cancel</button>}
 				</div>
 			))}
 		</section>

@@ -55,53 +55,49 @@ export function Auth() {
         const formData = Object.fromEntries(new FormData(event.target))
 
         if (!Object.values(formData).some(v => !v.trim())) {
-            try {
-                let response = null
+            let response = null
 
-                if (isRegistering) {
-                    response = await service.register({
-                        ...formData,
-                        wallet: 10000,
-                        wonAuctions: []
-                    })
+            if (isRegistering) {
+                response = await service.register({
+                    ...formData,
+                    wallet: 10000,
+                    wonAuctions: []
+                })
 
-                    if (response?.message === "Username is taken.") {
-                        response = await service.login(formData)
-                    }
-                } else {
+                if (response?.message === "Username is taken.") {
                     response = await service.login(formData)
                 }
+            } else {
+                response = await service.login(formData)
+            }
 
-                if (response && !response.message) {
-                    if (response.wallet <= 0) {
-                        response = { ...response, wallet: 10000 }
+            if (response && !response.message) {
+                if (response.wallet <= 0) {
+                    response = { ...response, wallet: 10000 }
 
-                        await service.updateUser(response)
-                    }
-
-                    for (let key in response) {
-                        if (key === "wonAuctions") {
-                            localStorage.setItem(key, JSON.stringify(response[key]))
-                        } else {
-                            localStorage.setItem(key, response[key])
-                        }
-                    }
-
-                    dispatch(userActions.setUser(response))
-
-                    const { users } = await service.readUsers()
-                    dispatch(usersActions.setUsers(users))
-
-                    if (users.length > 0 && !users.find(u => u._id === response._id)) {
-                        dispatch(usersActions.addUser(response))
-                    }
-
-                    navigate("/")
-                } else if (response && response.message) {
-                    setErrors(state => ({ ...state, server: response.message }))
+                    await service.updateUser(response)
                 }
-            } catch (error) {
-                console.log(error)
+
+                for (let key in response) {
+                    if (key === "wonAuctions") {
+                        localStorage.setItem(key, JSON.stringify(response[key]))
+                    } else {
+                        localStorage.setItem(key, response[key])
+                    }
+                }
+
+                dispatch(userActions.setUser(response))
+
+                const { users } = await service.readUsers()
+                dispatch(usersActions.setUsers(users))
+
+                if (users.length > 0 && !users.find(u => u._id === response._id)) {
+                    dispatch(usersActions.addUser(response))
+                }
+
+                navigate("/")
+            } else if (response && response.message) {
+                setErrors(state => ({ ...state, server: response.message }))
             }
         }
     }
