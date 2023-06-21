@@ -124,29 +124,19 @@ export function Auction() {
 	}
 
 	function sortAuctions(auctions, name, order) {
-		if (name === "name") {
-			if (order === "A-Z") {
-				return [...auctions].sort((a, z) => a.name.localeCompare(z.name))
-			} else {
-				return [...auctions].sort((a, z) => z.name.localeCompare(a.name))
+		if (name !== "action") {
+			let sortedAuctions = [...auctions]	
+			
+			if (name === "name") {
+				sortedAuctions.sort((a, z) => a.name.localeCompare(z.name))
+			} else if (name === "duration") {
+				sortedAuctions.sort((a, z) => a.duration - z.duration)
+			} else if (name === "price") {
+				sortedAuctions.sort((a, z) => a.price - z.price)
 			}
-		} else if (name === "duration") {
-			if (order === "A-Z") {
-				return [...auctions].sort((a, z) => {
-					return a.expirationTime - z.expirationTime
-				})
-			} else {
-				return [...auctions].sort((a, z) => {
-					return z.expirationTime - a.expirationTime
-				})
-			}
-		} else if (name === "price") {
-			if (order === "A-Z") {
-				return [...auctions].sort((a, z) => a.price - z.price)
-			} else {
-				return [...auctions].sort((a, z) => z.price - a.price)
-			}
-		} else if (name === "action") {
+
+			return order === "A-Z" ? sortedAuctions : sortedAuctions.reverse()
+		} else {
 			const ownAuctions = [...auctions].filter(a => a.ownerId === user._id)
 
 			const availableAuctions = [...auctions].filter(
