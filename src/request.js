@@ -1,5 +1,8 @@
+import * as localUser from "./localUser"
+
 async function requester(url, method, data) {
-    const accessToken = localStorage.getItem("accessToken")
+    const accessToken = localUser.get()?.accessToken
+
     const headers = {}
 
     if (accessToken) { headers["X-Authorization"] = accessToken }

@@ -1,11 +1,10 @@
 import { Navigate, useLocation, Outlet } from "react-router-dom"
+import * as localUser from "./localUser"
 
 export function Guard() {
     const location = useLocation()
 
-    if (
-        !localStorage.getItem("username")
-    ) {
+    if (!localUser.get()) {
         return <Navigate to={"/auth"} replace state={{ from: location }} />
     }
 

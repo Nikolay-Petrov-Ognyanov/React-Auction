@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux"
 import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
+import * as localUser from "../localUser"
 
 export function Profile() {
     const dispatch = useDispatch()
@@ -67,7 +68,7 @@ export function Profile() {
 
         await service.updateUser({ ...user, wallet: walletToBeUpdated })
 
-        localStorage.setItem("wallet", walletToBeUpdated)
+        localUser.set({...user, wallet: walletToBeUpdated})
 
         dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
         dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
@@ -76,7 +77,7 @@ export function Profile() {
     return user && <section>
         <p> Balance: {user.wallet} </p>
 
-        <p>Won auctions: {user.wonAuctions.length > 0 && user.wonAuctions.length} </p>
+        {user.wonAuctions.length > 0 && <p> Won auctions: {user.wonAuctions.length} </p>}
 
         <form onSubmit={handleSubmit} className="amount">
             <input
@@ -94,10 +95,10 @@ export function Profile() {
 
                 <div className="buttonsWrapper">
                     <button type="submit" onClick={() => setIsDepositing(true)}
-                    >Deposit</button>
+                    > Deposit </button>
 
                     <button type="submit" onClick={() => setIsDepositing(false)}
-                    >Withdraw</button>
+                    > Withdraw </button>
                 </div>
             }
         </form>

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom"
 import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
+import * as localUser from "../localUser"
 
 export function Auth() {
     const initialState = { username: "", password: "" }
@@ -78,17 +79,12 @@ export function Auth() {
                     await service.updateUser(response)
                 }
 
-                for (let key in response) {
-                    if (key === "wonAuctions") {
-                        localStorage.setItem(key, JSON.stringify(response[key]))
-                    } else {
-                        localStorage.setItem(key, response[key])
-                    }
-                }
+                localUser.set(response)
 
                 dispatch(userActions.setUser(response))
 
                 const { users } = await service.readUsers()
+
                 dispatch(usersActions.setUsers(users))
 
                 if (users.length > 0 && !users.find(u => u._id === response._id)) {
@@ -123,12 +119,15 @@ export function Auth() {
                     onBlur={validateInput}
                 />
 
-                {!Object.values(errors).some(entry => entry !== "") && !Object.values(inputs).some(entry => entry === "") && (
+                {
+                    !Object.values(errors).some(entry => entry !== "") &&
+                    !Object.values(inputs).some(entry => entry === "") &&
+
                     <div className="buttonsWrapper">
                         <button onClick={() => setIsRegistering(true)}>Register</button>
                         <button onClick={() => setIsRegistering(false)}>Login</button>
                     </div>
-                )}
+                }
             </form>
 
             <div className="errorsWrapper">

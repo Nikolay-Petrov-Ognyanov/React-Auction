@@ -4,6 +4,7 @@ import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
+import * as localUser from "../localUser"
 
 export function Auction() {
 	const dispatch = useDispatch()
@@ -19,15 +20,20 @@ export function Auction() {
 
 		let order = "A-Z"
 
-		if (localStorage.getItem("sortingCriteria")) {
-			if (JSON.parse(localStorage.getItem("sortingCriteria"))[0] === criteria) {
-				if (JSON.parse(localStorage.getItem("sortingCriteria"))[1] === "A-Z") {
+		if (localUser.get().sortingCriteria) {
+			const storedCriteria = localUser.get()?.sortingCriteria
+
+			if (storedCriteria[0] === criteria) {
+				if (storedCriteria[1] === "A-Z") {
 					order = "Z-A"
 				}
 			}
 		}
 
-		localStorage.setItem("sortingCriteria", JSON.stringify([criteria, order]))
+		localUser.set({
+			...user,
+			sortingCriteria: [criteria, order]
+		})
 
 		sortAuctions(auctions, criteria, order)
 		dispatch(auctionsActions.setAuctions(sortAuctions(auctions, criteria, order)))
@@ -120,10 +126,7 @@ export function Auction() {
 					if (user._id === seller._id) {
 						dispatch(userActions.setUser(sellerToBePaid))
 					} else if (user._id === buyer._id) {
-						localStorage.setItem("wonAuctions", JSON.stringify([
-							...buyer.wonAuctions,
-							auction
-						]))
+						localUser.set(buyerToBeAwarded)
 
 						dispatch(userActions.setUser(buyerToBeAwarded))
 					}
@@ -137,8 +140,8 @@ export function Auction() {
 				dispatch(auctionsActions.deleteAuction(auction._id))
 			})
 
-			if (localStorage.getItem("sortingCriteria")) {
-				const [name, order] = JSON.parse(localStorage.getItem("sortingCriteria"))
+			if (localUser.get()?.sortingCriteria) {
+				const [name, order] = localUser.get()?.sortingCriteria
 
 				setActiveButton(name)
 				dispatch(auctionsActions.setAuctions(sortAuctions(auctions, name, order)))
@@ -254,19 +257,19 @@ export function Auction() {
 			<header>
 				<button onClick={() => handleSorting("name")}
 					className={activeButton === "name" ? "active" : ""}
-				>Name</button>
+				> Name </button>
 
 				<button onClick={() => handleSorting("duration")}
 					className={activeButton === "duration" ? "active" : ""}
-				>Duration</button>
+				> Duration </button>
 
 				<button onClick={() => handleSorting("price")}
 					className={activeButton === "price" ? "active" : ""}
-				>Price</button>
+				> Price </button>
 
 				<button onClick={() => handleSorting("action")}
 					className={activeButton === "action" ? "active" : ""}
-				>Action</button>
+				> Action </button>
 			</header>
 
 			{auctions.map(a => (
@@ -279,17 +282,17 @@ export function Auction() {
 						</p>
 
 						<p className="auctionPrice">
-							{a.ownerId === user._id ? a.lastBid : a.price}
+							{a.ownerId === user._id ? a.lastBid || a.price : a.price}
 						</p>
 					</div>
 
 					{user._id !== a.highestBidderId && user._id !== a.ownerId && <button
 						className="cardButton" onClick={() => handleBid(a._id, a.price)}
-					>Bid</button>}
+					> Bid </button>}
 
 					{user._id === a.ownerId && <button
 						className="cardButton" onClick={() => handleCancel(a._id)}
-					>Cancel</button>}
+					> Cancel </button>}
 				</div>
 			))}
 		</section>

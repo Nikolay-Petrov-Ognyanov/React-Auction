@@ -2,6 +2,7 @@ import { useNavigate, NavLink } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { setUser } from "../features/user"
 import * as service from "../service"
+import * as localUser from "../localUser"
 
 export function Nav() {
     const dispatch = useDispatch()
@@ -18,7 +19,7 @@ export function Nav() {
         navigate("/auth")
     }
 
-    return <> {localStorage.getItem("username") ? <nav>
+    return <> {localUser.get() ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Auction</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
         <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>

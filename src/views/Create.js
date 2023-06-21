@@ -5,9 +5,9 @@ import * as service from "../service"
 import * as userActions from "../features/user"
 import * as usersActions from "../features/users"
 import * as auctionsActions from "../features/auctions"
+import * as localUser from "../localUser"
 
 export function Create() {
-    // Get user data from Redux store
     const user = useSelector(state => state.user.value)
 
     const dispatch = useDispatch()
@@ -16,7 +16,6 @@ export function Create() {
     const [inputs, setInputs] = useState({ name: "", price: "" })
     const [errors, setErrors] = useState({ name: "", price: "", server: "" })
 
-    // Handles input change in the form
     function handleInputChange(event) {
         const { name, value } = event.target
 
@@ -26,7 +25,6 @@ export function Create() {
         validateInput(event)
     }
 
-    // Validates the input values
     function validateInput(event) {
         const { name, value } = event.target
 
@@ -76,7 +74,7 @@ export function Create() {
         if (!response.message) {
             await service.updateUser(userToBeUpdated)
 
-            localStorage.setItem("wallet", walletToBeUpdated)
+            localUser.set({...user, wallet: walletToBeUpdated})
 
             dispatch(userActions.setUser(userToBeUpdated))
             dispatch(usersActions.updateUser(userToBeUpdated))

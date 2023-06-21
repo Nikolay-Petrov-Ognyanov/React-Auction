@@ -9,6 +9,7 @@ import { Profile } from "./views/Profile"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as userActions from "./features/user"
+import * as localUser from "./localUser"
 
 export default function App() {
 	const dispatch = useDispatch()
@@ -16,23 +17,11 @@ export default function App() {
 	const user = useSelector(state => state.user.value)
 
 	useEffect(() => {
-		if (!user && localStorage.getItem("accessToken")) {
-			const {
-				_id,
-				accessToken,
-				username,
-				wallet,
-				wonAuctions
-			} = localStorage
+		if (!user && localUser.get()) {
+			const storedUser = localUser.get()
 
-			dispatch(userActions.setUser({
-				_id,
-				accessToken,
-				username,
-				wallet,
-				wonAuctions: wonAuctions && JSON.parse(wonAuctions) || []
-			}))
-		} 
+			dispatch(userActions.setUser(storedUser))
+		}
 	}, [dispatch])
 
 	return <div className="App">
