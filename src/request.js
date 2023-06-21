@@ -1,7 +1,7 @@
 import * as localUser from "./localUser"
 
 async function requester(url, method, data) {
-    const accessToken = localUser.get()?.accessToken
+    const accessToken = localUser.get("accessToken")
 
     const headers = {}
 

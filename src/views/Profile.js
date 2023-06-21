@@ -31,7 +31,7 @@ export function Profile() {
             const stateObject = { ...state, [name]: "" }
 
             if (name === "amount") {
-                if (!value || value == 0) {
+                if (!value || Number(value) === 0) {
                     stateObject[name] = "Amount is required."
                 } else if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Amount must be a whole number."
@@ -68,16 +68,33 @@ export function Profile() {
 
         await service.updateUser({ ...user, wallet: walletToBeUpdated })
 
-        localUser.set({...user, wallet: walletToBeUpdated})
+        localUser.set({ ...user, wallet: walletToBeUpdated })
 
         dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
         dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
     }
 
-    return user && <section>
-        <p> Balance: {user.wallet} </p>
+    function renderUserStats(input) {
+        const word = String(input.split(" ")[0])
+        const length = user[`${word}Auctions`].length
 
-        {user.wonAuctions.length > 0 && <p> Won auctions: {user.wonAuctions.length} </p>}
+        if (length > 0) {
+            const text = input[0].toUpperCase() + input.slice(1)
+            const auction = length === 1 ? " auction." : " auctions."
+
+            return <p className="userStats"> {text} {length} {auction} </p>
+        }
+    }
+
+    return user && <section>
+        <h1> {user.username} </h1>
+
+        {renderUserStats("created")}
+        {renderUserStats("sold")}
+        {renderUserStats("bid in")}
+        {renderUserStats("won")}
+
+        <p> Balance: {user.wallet} </p>
 
         <form onSubmit={handleSubmit} className="amount">
             <input

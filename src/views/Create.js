@@ -58,23 +58,29 @@ export function Create() {
 
         const expirationTime = Date.now() + 5 * 60 * 1000
         const deposit = Math.ceil(price / 20)
-        const walletToBeUpdated = user.wallet - deposit
-        const userToBeUpdated = { ...user, wallet: walletToBeUpdated }
 
         const auction = {
             name,
             price,
             deposit,
             expirationTime,
-            ownerId: user._id,
-            biddersIds: []
+            ownerId: user._id
         }
+        
         const response = await service.createAuction(auction)
 
         if (!response.message) {
+            const walletToBeUpdated = user.wallet - deposit
+
+            const userToBeUpdated = {
+                ...user,
+                wallet: walletToBeUpdated,
+                createdAuctions: [...user.createdAuctions, response._id]
+            }
+
             await service.updateUser(userToBeUpdated)
 
-            localUser.set({...user, wallet: walletToBeUpdated})
+            localUser.set({ ...user, wallet: walletToBeUpdated })
 
             dispatch(userActions.setUser(userToBeUpdated))
             dispatch(usersActions.updateUser(userToBeUpdated))
