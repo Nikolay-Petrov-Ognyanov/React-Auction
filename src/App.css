@@ -159,3 +159,17 @@ header {
 	justify-content: space-between;
 	margin-bottom: 2vw;
 }
+
+.stats,
+.balance {
+	font-size: 4vw;
+}
+
+.balance {
+	margin: 1vw 0;
+}
+
+.transactionWrapper {
+	display: flex;
+	gap: 2vw;
+}

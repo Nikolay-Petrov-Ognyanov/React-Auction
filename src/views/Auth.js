@@ -30,8 +30,8 @@ export function Auth() {
             if (name === "username") {
                 if (!value) {
                     stateObject[name] = "Username is required."
-                } else if (value.length < 2) {
-                    stateObject[name] = "Username must be at least 2 characters long."
+                } else if (value.length < 2 || value.length > 8) {
+                    stateObject[name] = "Username must be between 2 and 8 characters long."
                 }
             } else if (name === "password") {
                 if (!value) {

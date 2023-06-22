@@ -15,7 +15,7 @@ export function Auction() {
 
 	const [searchInput, setSearchInput] = useState("")
 	const [activeButton, setActiveButton] = useState("")
-	const [order, setOrder] = useState(localUser.get("sortingCriteria")[1] || "A-Z")
+	const [order, setOrder] = useState(localUser.get()?.storedCriteria || "A-Z")
 
 	useEffect(() => {
 		async function fetchUsers() {
@@ -68,7 +68,7 @@ export function Auction() {
 				return [...ownAuctions, ...availableAuctions, ...bidAuctions]
 			}
 		}
-	}, [user?._id])
+	}, [user])
 
 	useEffect(() => {
 		async function fetchAuctions() {
@@ -166,12 +166,12 @@ export function Auction() {
 		return () => clearInterval(interval)
 	}, [
 		dispatch,
-		user?._id,
-		user?.soldAuctions,
+		user,
 		users,
 		searchInput,
 		activeButton,
-		order
+		order,
+		sortAuctions
 	])
 
 	function handeSearchInputChange(event) {

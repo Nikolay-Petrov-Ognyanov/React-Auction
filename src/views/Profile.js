@@ -11,38 +11,9 @@ export function Profile() {
     const user = useSelector(state => state.user.value)
 
     const [isDepositing, setIsDepositing] = useState(true)
+    const [input, setInput] = useState("")
 
-    const [input, setInput] = useState({ amount: "" })
-    const [error, setError] = useState({ amount: "", server: "" })
-
-    function handleInputChange(event) {
-        const { name, value } = event.target
-
-        setInput({ ...input, [name]: value })
-        setError({ ...error, server: "" })
-
-        validateInput(event)
-    }
-
-    function validateInput(event) {
-        const { name, value } = event.target
-
-        setError(state => {
-            const stateObject = { ...state, [name]: "" }
-
-            if (name === "amount") {
-                if (!value || Number(value) === 0) {
-                    stateObject[name] = "Amount is required."
-                } else if (!Number.isInteger(Number(value))) {
-                    stateObject[name] = "Amount must be a whole number."
-                } else if (value.length > 10) {
-                    stateObject[name] = "Amount can be at most 10 characters long."
-                }
-            }
-
-            return stateObject
-        })
-    }
+    function handleInputChange(event) { setInput(event.target.value)}
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -82,47 +53,28 @@ export function Profile() {
             const text = input[0].toUpperCase() + input.slice(1)
             const auction = length === 1 ? " auction." : " auctions."
 
-            return <p> {text} {length} {auction} </p>
+            return <span className="stats"> {text} {length} {auction} </span>
         }
     }
 
     return user && <section>
-        <h1> {user.username} </h1>
+        <div> {renderUserStats("created")} {renderUserStats("sold")} </div>
+        <div> {renderUserStats("bid in")} {renderUserStats("won")} </div>
 
-        {renderUserStats("created")}
-        {renderUserStats("sold")}
-        {renderUserStats("bid in")}
-        {renderUserStats("won")}
-
-        <p> Balance: {user.wallet} </p>
+        <p className="balance"> Balance: {user.wallet} </p>
 
         <form onSubmit={handleSubmit} className="amount">
-            <input
-                type="number"
-                name="amount"
-                placeholder="Amount"
-                value={input.amount}
-                onChange={handleInputChange}
-                onBlur={validateInput}
-            />
+            <div className="transactionWrapper">
+                {!Object.values(input).some(entry => entry === "" || entry === 0) && <button type="submit" className="deposit" onClick={() => setIsDepositing(true)}
+                > Deposit </button>}
 
-            {
-                !Object.values(error).some(entry => entry !== "") &&
-                !Object.values(input).some(entry => entry === "" || entry === 0) &&
+                <input type="number" name="amount"
+                    value={input.amount} onChange={handleInputChange}
+                />
 
-                <div className="buttonsWrapper">
-                    <button type="submit" onClick={() => setIsDepositing(true)}
-                    > Deposit </button>
-
-                    <button type="submit" onClick={() => setIsDepositing(false)}
-                    > Withdraw </button>
-                </div>
-            }
+                {!Object.values(input).some(entry => entry === "" || entry === 0) && <button type="submit" className="withdraw" onClick={() => setIsDepositing(false)}
+                > Withdraw </button>}
+            </div>
         </form>
-
-        <div className="errorWrapper">
-            {error.amount && <p className="error">{error.amount}</p>}
-            {error.server && <p className="error">{error.server}</p>}
-        </div>
     </section>
 }
