@@ -82,7 +82,7 @@ export function Profile() {
             const text = input[0].toUpperCase() + input.slice(1)
             const auction = length === 1 ? " auction." : " auctions."
 
-            return <p className="userStats"> {text} {length} {auction} </p>
+            return <p> {text} {length} {auction} </p>
         }
     }
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as service from "../service"
 import * as userActions from "../features/user"
@@ -13,7 +13,9 @@ export function Auction() {
 	const users = useSelector(state => state.users)
 	const auctions = useSelector(state => state.auctions)
 
+	const [searchInput, setSearchInput] = useState("")
 	const [activeButton, setActiveButton] = useState("")
+	const [order, setOrder] = useState(localUser.get("sortingCriteria")[1] || "A-Z")
 
 	useEffect(() => {
 		async function fetchUsers() {
@@ -23,12 +25,57 @@ export function Auction() {
 		fetchUsers()
 	}, [dispatch])
 
+
+	function handleSorting(criteria) {
+		if (activeButton !== criteria) {
+			setActiveButton(criteria)
+		} else {
+			order === "A-Z" ? setOrder("Z-A") : setOrder("A-Z")
+		}
+
+		localUser.set({ ...user, sortingCriteria: [criteria, order] })
+
+		sortAuctions(auctions, criteria, order)
+
+		dispatch(auctionsActions.setAuctions(sortAuctions(auctions, criteria, order)))
+	}
+
+	const sortAuctions = useCallback((auctions, name, order) => {
+		if (name !== "action") {
+			let sortedAuctions = [...auctions]
+
+			if (name === "name") {
+				sortedAuctions.sort((a, z) => a.name.localeCompare(z.name))
+			} else if (name === "duration") {
+				sortedAuctions.sort((a, z) => a.duration - z.duration)
+			} else if (name === "price") {
+				sortedAuctions.sort((a, z) => a.price - z.price)
+			}
+
+			return order === "A-Z" ? sortedAuctions : sortedAuctions.reverse()
+		} else {
+			const ownAuctions = [...auctions].filter(a => a.ownerId === user._id)
+
+			const availableAuctions = [...auctions].filter(
+				a => a.highestBidderId !== user._id && a.ownerId !== user._id
+			)
+
+			const bidAuctions = [...auctions].filter(a => a.highestBidderId === user._id)
+
+			if (order === "A-Z") {
+				return [...availableAuctions, ...ownAuctions, ...bidAuctions]
+			} else {
+				return [...ownAuctions, ...availableAuctions, ...bidAuctions]
+			}
+		}
+	}, [user?._id])
+
 	useEffect(() => {
 		async function fetchAuctions() {
 			const result = await service.readAuctions()
-			const { auctions } = result
+			const auctions = result && searchFilter(result.auctions)
 
-			auctions.forEach(async auction => {
+			result && auctions.forEach(async auction => {
 				if (auction.expirationTime > Date.now()) return
 
 				const buyer = users.find(u => u._id === auction.highestBidderId)
@@ -98,59 +145,37 @@ export function Auction() {
 
 		fetchAuctions()
 
+		function searchFilter(auctions) {
+			if (auctions) {
+				if (searchInput) {
+					const searchResult = auctions.filter(auction => {
+						return searchInput.split("").some(character => {
+							return auction.name.includes(character)
+						})
+					})
+
+					return searchResult.flat()
+				}
+
+				return auctions
+			}
+		}
+
 		const interval = setInterval(fetchAuctions, 1000)
 
 		return () => clearInterval(interval)
-	}, [dispatch, user?._id, user?.soldAuctions, users])
+	}, [
+		dispatch,
+		user?._id,
+		user?.soldAuctions,
+		users,
+		searchInput,
+		activeButton,
+		order
+	])
 
-	function handleSorting(criteria) {
-		setActiveButton(criteria)
-
-		let order = "A-Z"
-
-		if (localUser.get("sortingCriteria")) {
-			const storedCriteria = localUser.get("sortingCriteria")
-
-			if (storedCriteria[0] === criteria && storedCriteria[1] === "A-Z") {
-				order = "Z-A"
-			}
-		}
-
-		localUser.set({ ...user, sortingCriteria: [criteria, order] })
-
-		sortAuctions(auctions, criteria, order)
-
-		dispatch(auctionsActions.setAuctions(sortAuctions(auctions, criteria, order)))
-	}
-
-	function sortAuctions(auctions, name, order) {
-		if (name !== "action") {
-			let sortedAuctions = [...auctions]	
-			
-			if (name === "name") {
-				sortedAuctions.sort((a, z) => a.name.localeCompare(z.name))
-			} else if (name === "duration") {
-				sortedAuctions.sort((a, z) => a.duration - z.duration)
-			} else if (name === "price") {
-				sortedAuctions.sort((a, z) => a.price - z.price)
-			}
-
-			return order === "A-Z" ? sortedAuctions : sortedAuctions.reverse()
-		} else {
-			const ownAuctions = [...auctions].filter(a => a.ownerId === user._id)
-
-			const availableAuctions = [...auctions].filter(
-				a => a.highestBidderId !== user._id && a.ownerId !== user._id
-			)
-
-			const bidAuctions = [...auctions].filter(a => a.highestBidderId === user._id)
-
-			if (order === "A-Z") {
-				return [...availableAuctions, ...ownAuctions, ...bidAuctions]
-			} else {
-				return [...ownAuctions, ...availableAuctions, ...bidAuctions]
-			}
-		}
+	function handeSearchInputChange(event) {
+		setSearchInput(event.target.value)
 	}
 
 	function formatTime(time) {
@@ -186,8 +211,6 @@ export function Auction() {
 				onClick={() => handleBid(auction._id, auction.price)}
 			> Bid </button>
 		}
-
-		return null
 	}
 
 	async function handleBid(auctionId, price) {
@@ -268,7 +291,14 @@ export function Auction() {
 
 	return (
 		<section>
-			<input type="text" className="searchBar" />
+			<input
+				type="text"
+				className="search"
+				name="search"
+				placeholder="Search"
+				value={searchInput}
+				onChange={handeSearchInputChange}
+			/>
 
 			<header>
 				<button onClick={() => handleSorting("name")}
