@@ -66,7 +66,7 @@ export function Create() {
             expirationTime,
             ownerId: user._id
         }
-        
+
         const response = await service.createAuction(auction)
 
         if (!response.message) {
@@ -116,6 +116,7 @@ export function Create() {
                 {
                     !Object.values(errors).some(entry => entry !== "") &&
                     !Object.values(inputs).some(entry => entry === "") &&
+                    user.wallet >= Math.ceil(Number(inputs.price) / 20) &&
 
                     <div className="buttonsWrapper">
                         <button type="submit">Save</button>

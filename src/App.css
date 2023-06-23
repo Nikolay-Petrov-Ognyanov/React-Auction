@@ -160,16 +160,23 @@ header {
 	margin-bottom: 2vw;
 }
 
-.stats,
-.balance {
-	font-size: 4vw;
+.profile {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: center;
+	height: calc(100vh - 10vw);
 }
 
-.balance {
-	margin: 1vw 0;
+.renderUserStats {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .transactionWrapper {
 	display: flex;
 	gap: 2vw;
+	margin-bottom: 1.5vw;
 }

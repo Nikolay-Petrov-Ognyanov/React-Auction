@@ -292,12 +292,8 @@ export function Auction() {
 	return (
 		<section>
 			<input
-				type="text"
-				className="search"
-				name="search"
-				placeholder="Search"
-				value={searchInput}
-				onChange={handeSearchInputChange}
+				type="text" className="search" name="search" placeholder="Search"
+				value={searchInput} onChange={handeSearchInputChange}
 			/>
 
 			<header>

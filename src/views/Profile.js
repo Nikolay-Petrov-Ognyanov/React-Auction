@@ -13,7 +13,7 @@ export function Profile() {
     const [isDepositing, setIsDepositing] = useState(true)
     const [input, setInput] = useState("")
 
-    function handleInputChange(event) { setInput(event.target.value)}
+    function handleInputChange(event) { setInput(event.target.value) }
 
     async function handleSubmit(event) {
         event.preventDefault()
@@ -43,37 +43,68 @@ export function Profile() {
 
         dispatch(userActions.setUser({ ...user, wallet: walletToBeUpdated }))
         dispatch(usersActions.updateUser({ ...user, wallet: walletToBeUpdated }))
+
+        setInput("")
     }
 
-    function renderUserStats(input) {
-        const word = String(input.split(" ")[0])
-        const length = user[`${word}Auctions`].length
+    function renderUserStats() {
+        const created = user.createdAuctions.length && `created ${user.createdAuctions.length}`
+        const sold = user.soldAuctions.length && `sold ${user.soldAuctions.length}`
+        const bid = user.bidAuctions.length && `bid in ${user.bidAuctions.length}`
+        const won = user.wonAuctions.length && `won ${user.wonAuctions.length}`
 
-        if (length > 0) {
-            const text = input[0].toUpperCase() + input.slice(1)
-            const auction = length === 1 ? " auction." : " auctions."
+        let array = [created, sold, bid, won].filter(entry => entry !== 0)
 
-            return <span className="stats"> {text} {length} {auction} </span>
+        if (array[0]) {
+            const word = array[0][0].toUpperCase() + array[0].slice(1)
+            const auction = array[0].slice(-1) === "1" ? " auction" : " auctions"
+            const string = word + auction
+
+            array.splice(0, 1, string)
         }
+
+        if (array.length > 1) {
+            const string = ` and ${array[array.length - 1]}`
+
+            array.splice(array.length - 1, 1, string)
+        }
+
+        if (array.length > 2) {
+            for (let i = 0; i < array.length - 2; i++) {
+                array[i] = array[i] && array[i] + ", "
+            }
+        }
+
+        array[array.length - 1] = array[array.length - 1] + "."
+
+        if (array.length === 4) {
+            return <>
+                <p> {array[0]} {array[1]} </p>
+                <p> {array[2]} {array[3]} </p>
+            </>
+        }
+
+        return <p> {array} </p>
     }
 
-    return user && <section>
-        <div> {renderUserStats("created")} {renderUserStats("sold")} </div>
-        <div> {renderUserStats("bid in")} {renderUserStats("won")} </div>
+    return user && <section className="profile">
+        <h1> {user.username} </h1>
 
-        <p className="balance"> Balance: {user.wallet} </p>
+        <div className="renderUserStats"> {renderUserStats()} </div>
 
         <form onSubmit={handleSubmit} className="amount">
             <div className="transactionWrapper">
-                {!Object.values(input).some(entry => entry === "" || entry === 0) && <button type="submit" className="deposit" onClick={() => setIsDepositing(true)}
-                > Deposit </button>}
+                <button type="submit" className="deposit"
+                    onClick={() => setIsDepositing(true)}
+                > Deposit </button>
 
-                <input type="number" name="amount"
-                    value={input.amount} onChange={handleInputChange}
+                <input type="number" name="amount" placeholder={"Balance: " + user.wallet}
+                    value={input} onChange={handleInputChange}
                 />
 
-                {!Object.values(input).some(entry => entry === "" || entry === 0) && <button type="submit" className="withdraw" onClick={() => setIsDepositing(false)}
-                > Withdraw </button>}
+                <button type="submit" className="withdraw"
+                    onClick={() => setIsDepositing(false)}
+                > Withdraw </button>
             </div>
         </form>
     </section>
