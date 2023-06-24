@@ -32,15 +32,3 @@ The project uses several third-party libraries and frameworks. The main dependen
 - React Router: Library for handling routing in a React application.
 
 For a complete list of dependencies, please refer to the `package.json` file.
-
-## Contributing
-
-Contributions to the Online Auction App are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request. Make sure to follow the project's coding style and guidelines.
-
-## License
-
-The Online Auction App is open-source and released under the [MIT License](LICENSE).
-
----
-
-Please note that the README file is just a template. You should update it with accurate information and instructions specific to your project.

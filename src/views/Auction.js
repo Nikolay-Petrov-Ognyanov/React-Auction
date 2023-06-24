@@ -174,9 +174,7 @@ export function Auction() {
 		sortAuctions
 	])
 
-	function handeSearchInputChange(event) {
-		setSearchInput(event.target.value)
-	}
+	function handeSearchInputChange(event) { setSearchInput(event.target.value) }
 
 	function formatTime(time) {
 		const minutes = Math.floor(time / 60000)
@@ -214,8 +212,6 @@ export function Auction() {
 	}
 
 	async function handleBid(auctionId, price) {
-		if (user.wallet < price) return
-
 		const nextPrice = calculateNextPrice(price)
 		const auctionFromServer = auctions.find(a => a._id === auctionId)
 		const previousBidder = users.find(u => u._id === auctionFromServer.highestBidderId)

@@ -22,7 +22,7 @@ export default function App() {
 
 			dispatch(userActions.setUser(storedUser))
 		}
-	}, [dispatch])
+	}, [dispatch, user])
 
 	return <div className="App">
 		<Nav />
