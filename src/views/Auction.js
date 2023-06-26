@@ -207,7 +207,7 @@ export function Auction() {
 		) {
 			return <button className="cardButton"
 				onClick={() => handleBid(auction._id, auction.price)}
-			> Bid </button>
+			>Bid</button>
 		}
 	}
 
@@ -295,19 +295,19 @@ export function Auction() {
 			<header>
 				<button onClick={() => handleSorting("name")}
 					className={activeButton === "name" ? "active" : ""}
-				> Name </button>
+				>Name</button>
 
 				<button onClick={() => handleSorting("duration")}
 					className={activeButton === "duration" ? "active" : ""}
-				> Duration </button>
+				>Duration</button>
 
 				<button onClick={() => handleSorting("price")}
 					className={activeButton === "price" ? "active" : ""}
-				> Price </button>
+				>Price</button>
 
 				<button onClick={() => handleSorting("action")}
 					className={activeButton === "action" ? "active" : ""}
-				> Action </button>
+				>Action</button>
 			</header>
 
 			{auctions.map(a => (
@@ -328,7 +328,7 @@ export function Auction() {
 
 					{user._id === a.ownerId && <button className="cardButton"
 						onClick={() => handleCancel(a._id)}
-					> Cancel </button>}
+					>Cancel</button>}
 				</div>
 			))}
 		</section>

@@ -96,7 +96,7 @@ export function Profile() {
             <div className="transactionWrapper">
                 <button type="submit" className="deposit"
                     onClick={() => setIsDepositing(true)}
-                > Deposit </button>
+                >Deposit</button>
 
                 <input type="number" name="amount" placeholder={"Balance: " + user.wallet}
                     value={input} onChange={handleInputChange}
@@ -104,7 +104,7 @@ export function Profile() {
 
                 <button type="submit" className="withdraw"
                     onClick={() => setIsDepositing(false)}
-                > Withdraw </button>
+                >Withdraw</button>
             </div>
         </form>
     </section>

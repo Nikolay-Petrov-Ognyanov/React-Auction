@@ -118,7 +118,7 @@ export function Create() {
                         <button type="submit">Save</button>
                         <button type="reset" onClick={() => {
                             setInputs({ name: "", price: 0 })
-                        }}> Reset </button>
+                        }}>Reset</button>
                     </div>
                 }
             </form>

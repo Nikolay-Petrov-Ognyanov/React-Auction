@@ -22,7 +22,7 @@ export function Nav() {
     return <> {localUser.get() ? <nav>
         <NavLink to={"/"} className="button" activeclassname="active">Auction</NavLink>
         <NavLink to={"/create"} className="button" activeclassname="active">Create</NavLink>
-        <NavLink to={"/profile"} className="button" activeclassname="active"> Profile </NavLink>
+        <NavLink to={"/profile"} className="button" activeclassname="active">Profile</NavLink>
 
         <button onClick={handleLogout}>Logout</button>
     </nav> : <h1>Sign in</h1>} </>

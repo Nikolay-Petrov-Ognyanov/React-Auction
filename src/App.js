@@ -17,11 +17,7 @@ export default function App() {
 	const user = useSelector(state => state.user.value)
 
 	useEffect(() => {
-		if (!user && localUser.get()) {
-			const storedUser = localUser.get()
-
-			dispatch(userActions.setUser(storedUser))
-		}
+		if (!user && localUser.get()) dispatch(userActions.setUser(localUser.get()))
 	}, [dispatch, user])
 
 	return <div className="App">
