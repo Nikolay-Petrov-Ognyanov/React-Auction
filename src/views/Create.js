@@ -8,7 +8,7 @@ import * as auctionsActions from "../features/auctions"
 import * as localUser from "../localUser"
 
 export function Create() {
-    const user = useSelector(state => state.user.value)
+    const user = useSelector(state => state.user?.value)
 
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -32,15 +32,11 @@ export function Create() {
             const stateObject = { ...state, [name]: "" }
 
             if (name === "name") {
-                if (!value) {
-                    stateObject[name] = "Name is required."
-                } else if (value.length > 10) {
+                if (value.length > 10) {
                     stateObject[name] = "Name can be at most 10 characters long."
                 }
             } else if (name === "price") {
-                if (!value) {
-                    stateObject[name] = "Price is required."
-                } else if (!Number.isInteger(Number(value))) {
+                if (!Number.isInteger(Number(value))) {
                     stateObject[name] = "Price must be a whole number."
                 } else if (value.length > 10) {
                     stateObject[name] = "Price can be at most 10 characters long."
@@ -116,7 +112,7 @@ export function Create() {
                 {
                     !Object.values(errors).some(entry => entry !== "") &&
                     !Object.values(inputs).some(entry => entry === "") &&
-                    user.wallet >= Math.ceil(Number(inputs.price) / 20) &&
+                    user?.wallet >= Math.ceil(Number(inputs.price) / 20) &&
 
                     <div className="buttonsWrapper">
                         <button type="submit">Save</button>

@@ -28,15 +28,11 @@ export function Auth() {
             const stateObject = { ...state, [name]: "" }
 
             if (name === "username") {
-                if (!value) {
-                    stateObject[name] = "Username is required."
-                } else if (value.length < 2 || value.length > 20) {
+                if (value.length < 2 || value.length > 20) {
                     stateObject[name] = "Username must be between 2 and 20 characters long."
                 }
             } else if (name === "password") {
-                if (!value) {
-                    stateObject[name] = "Password is required."
-                } else if (value.length < 5) {
+                if (value.length < 5) {
                     stateObject[name] = "Password must be at least 5 characters long."
                 }
             }
