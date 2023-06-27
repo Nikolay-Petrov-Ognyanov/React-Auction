@@ -1,13 +1,14 @@
 import { Auth } from "./Auth"
-import { render, fireEvent } from "@testing-library/react"
+import { render, fireEvent, waitFor } from "@testing-library/react"
 import { Provider } from "react-redux"
 import configureStore from "redux-mock-store"
 import { MemoryRouter } from "react-router-dom"
+import * as service from "../service"
 
 const mockStore = configureStore([])
 const store = mockStore({})
 
-test("validates input fields", () => {
+test("input validation", () => {
     const { getByPlaceholderText, getByText } = render(
         <Provider store={store}>
             <MemoryRouter>
@@ -33,4 +34,51 @@ test("validates input fields", () => {
 
     expect(usernameError).not.toBeInTheDocument()
     expect(passwordError).not.toBeInTheDocument()
+})
+
+jest.mock("../service", () => ({
+    register: jest.fn(formData => Promise.resolve({})),
+    login: jest.fn(formData => Promise.resolve({})),
+    updateUser: jest.fn(userData => Promise.resolve({})),
+    readUsers: jest.fn(() => Promise.resolve({ users: [] }))
+}))
+
+test("authorization", async () => {
+    const { getByPlaceholderText, getByText } = render(
+        <MemoryRouter>
+            <Provider store={store}>
+                <Auth />
+            </Provider>
+        </MemoryRouter>
+    )
+
+    const usernameInput = getByPlaceholderText("Username")
+    const passwordInput = getByPlaceholderText("Password")
+
+    fireEvent.change(usernameInput, { target: { value: "validusername" } })
+    fireEvent.change(passwordInput, { target: { value: "validpassword" } })
+
+    const registerButton = getByText("Register")
+    const loginButton = getByText("Login")
+
+    fireEvent.click(registerButton)
+    fireEvent.click(loginButton)
+
+    await waitFor(() => {
+        expect(service.register).toHaveBeenCalledWith({
+            username: "validusername",
+            password: "validpassword",
+            wallet: 10000,
+            wonAuctions: []
+        })
+    })
+
+    await waitFor(() => {
+        expect(service.register).toHaveBeenCalledWith({
+            username: "validusername",
+            password: "validpassword",
+            wallet: 10000,
+            wonAuctions: []
+        })
+    })
 })

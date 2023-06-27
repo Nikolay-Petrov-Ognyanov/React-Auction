@@ -1,19 +1,20 @@
 import { Create } from "./Create"
-import { render, fireEvent } from "@testing-library/react"
+import { render, fireEvent, waitFor, screen } from "@testing-library/react"
 import { Provider } from "react-redux"
 import configureStore from "redux-mock-store"
 import { MemoryRouter } from "react-router-dom"
+import * as service from "../service"
 
 const mockStore = configureStore([])
 const store = mockStore({})
 
 test("validates input fields", () => {
     const { getByPlaceholderText, getByText } = render(
-        <Provider store={store}>
-            <MemoryRouter>
+        <MemoryRouter>
+            <Provider store={store}>
                 <Create />
-            </MemoryRouter>
-        </Provider>
+            </Provider>
+        </MemoryRouter>
     )
 
     const nameInput = getByPlaceholderText("Name")

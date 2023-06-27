@@ -116,6 +116,7 @@ export function Create() {
 
                     <div className="buttonsWrapper">
                         <button type="submit">Save</button>
+
                         <button type="reset" onClick={() => {
                             setInputs({ name: "", price: 0 })
                         }}>Reset</button>
